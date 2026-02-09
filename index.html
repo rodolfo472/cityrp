@@ -2,36 +2,85 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sistema de Acesso Gamer</title>
+<title>Sistema Gamer</title>
 
 <style>
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
     background: #0f172a;
     color: #e5e7eb;
-    text-align: center;
 }
 
+/* USUÁRIO TOPO */
+#userTop {
+    position: fixed;
+    top: 6px;
+    left: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    animation: neon 3s infinite alternate;
+    z-index: 1000;
+}
+
+#timeOnline {
+    position: fixed;
+    top: 22px;
+    left: 10px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+#coins {
+    position: fixed;
+    top: 38px;
+    left: 10px;
+    font-size: 11px;
+    color: #facc15;
+}
+
+/* AVATAR */
+#avatarBox {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    z-index: 1000;
+}
+#avatarImg {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #38bdf8;
+}
+#avatarInput {
+    font-size: 9px;
+    width: 80px;
+    color: #94a3b8;
+}
+
+/* CONTAINER */
 .container {
     background: #020617;
     max-width: 420px;
-    margin: 60px auto;
+    margin: 90px auto;
     padding: 25px;
     border-radius: 10px;
+    text-align: center;
 }
 
 input, button {
     width: 90%;
     padding: 10px;
-    margin: 8px 0;
+    margin: 6px 0;
     border-radius: 6px;
     border: none;
 }
 
 button {
     background: #38bdf8;
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
 }
 
 button:hover {
@@ -45,121 +94,253 @@ button:hover {
 .banner {
     width: 100%;
     border-radius: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+}
+
+/* RANKING */
+#rankBtn {
+    position: fixed;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+#rankingBox {
+    position: fixed;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #020617;
+    border: 1px solid #38bdf8;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 12px;
+    width: 180px;
+}
+
+#rankingBox ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ALERTA */
+#alertMini {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #020617;
+    border: 1px solid #f87171;
+    color: #f87171;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: none;
+}
+
+@keyframes neon {
+    0% { color: #38bdf8; }
+    50% { color: #22c55e; }
+    100% { color: #a855f7; }
 }
 </style>
 </head>
 
 <body>
 
+<div id="userTop" class="hidden"></div>
+<div id="timeOnline" class="hidden"></div>
+<div id="coins" class="hidden"></div>
+
+<div id="avatarBox" class="hidden">
+    <img id="avatarImg">
+    <input type="file" id="avatarInput" accept="image/*" onchange="setAvatar()">
+</div>
+
+<button id="rankBtn" onclick="toggleRanking()">🏆</button>
+<div id="rankingBox" class="hidden">
+    <h3>🏆 Ranking</h3>
+    <ul id="rankingList"></ul>
+</div>
+
 <div class="container">
 
-    <!-- MENU -->
     <div id="stepMenu">
         <img src="jogos.jpg" class="banner">
-        <h2>Conta</h2>
-        <button onclick="showLogin()">Já sou cadastrado</button>
+        <button onclick="showLogin()">Login</button>
         <button onclick="showRegister()">Registrar</button>
     </div>
 
-    <!-- LOGIN -->
     <div id="stepLogin" class="hidden">
-        <h2>🔑 Login</h2>
-        <input id="loginUser" placeholder="Nome da conta">
+        <input id="loginUser" placeholder="Usuário">
         <input type="password" id="loginPass" placeholder="Senha">
         <button onclick="login()">Entrar</button>
         <button onclick="backMenu()">Voltar</button>
     </div>
 
-    <!-- REGISTRO -->
     <div id="stepRegister" class="hidden">
-        <h2>📝 Criar conta</h2>
-        <input id="regUser" placeholder="Nome da conta">
+        <input id="regUser" placeholder="Usuário">
         <input type="password" id="regPass" placeholder="Senha">
-        <button onclick="register()">Criar conta</button>
+        <button onclick="register()">Criar</button>
         <button onclick="backMenu()">Voltar</button>
     </div>
 
-    <!-- SITE -->
     <div id="site" class="hidden">
         <img src="jogos.jpg" class="banner">
-        <h1>🎮 Bem-vindo ao site sobre jogos!</h1>
-        <p>Você entrou com sucesso.</p>
-
         <button onclick="irParaJogos()">Explorar jogos 🎮</button>
+        <button onclick="showChangePass()">Trocar senha 🔐</button>
         <button onclick="logout()">Sair</button>
+
+        <h3>🛒 Loja</h3>
+        <button onclick="buyBorder(100)">Borda 100</button>
+        <button onclick="buyBorder(500)">Borda 500</button>
+        <button onclick="buyBorder(1000)">Borda Lendária 🔥</button>
+
+        <h3>🏆 Prêmio</h3>
+        <button onclick="buyPrize()">Comprar (5000)</button>
+    </div>
+
+    <div id="changePass" class="hidden">
+        <input type="password" id="oldPass" placeholder="Senha atual">
+        <input type="password" id="newPass" placeholder="Nova senha">
+        <button onclick="changePassword()">Salvar</button>
+        <button onclick="enterSite(loggedUser)">Cancelar</button>
     </div>
 
 </div>
 
+<div id="alertMini">Você não tem moedas suficientes 💸</div>
+
 <script>
-// carrega usuários salvos
 let userData = JSON.parse(localStorage.getItem("users")) || {};
+let loggedUser = localStorage.getItem("loggedUser");
+let coins = 0, coinTimer, loginTime, timerInterval;
+
+if (loggedUser) enterSite(loggedUser);
 
 function hideAll() {
-    document.getElementById("stepMenu").classList.add("hidden");
-    document.getElementById("stepLogin").classList.add("hidden");
-    document.getElementById("stepRegister").classList.add("hidden");
-    document.getElementById("site").classList.add("hidden");
+    document.querySelectorAll(".container > div").forEach(d => d.classList.add("hidden"));
 }
 
-function showLogin() {
+function showLogin(){ hideAll(); stepLogin.classList.remove("hidden"); }
+function showRegister(){ hideAll(); stepRegister.classList.remove("hidden"); }
+function backMenu(){ hideAll(); stepMenu.classList.remove("hidden"); }
+
+function register(){
+    if(userData[regUser.value]) return alert("Já existe");
+    userData[regUser.value]=regPass.value;
+    localStorage.setItem("users",JSON.stringify(userData));
+    localStorage.setItem("loggedUser",regUser.value);
+    enterSite(regUser.value);
+}
+
+function login(){
+    if(userData[loginUser.value]===loginPass.value){
+        localStorage.setItem("loggedUser",loginUser.value);
+        enterSite(loginUser.value);
+    } else alert("Erro");
+}
+
+function enterSite(user){
     hideAll();
-    document.getElementById("stepLogin").classList.remove("hidden");
+    loggedUser=user;
+    userTop.innerText="👤 "+user;
+    userTop.classList.remove("hidden");
+    timeOnline.classList.remove("hidden");
+    coinsEl();
+    avatarBox.classList.remove("hidden");
+    loadAvatar(user);
+    startTimer();
+    startCoins();
+    site.classList.remove("hidden");
 }
 
-function showRegister() {
-    hideAll();
-    document.getElementById("stepRegister").classList.remove("hidden");
+function logout(){
+    localStorage.removeItem("loggedUser");
+    clearInterval(timerInterval);
+    clearInterval(coinTimer);
+    location.reload();
 }
 
-function backMenu() {
-    hideAll();
-    document.getElementById("stepMenu").classList.remove("hidden");
+/* TEMPO */
+function startTimer(){
+    loginTime=Date.now();
+    timerInterval=setInterval(()=>{
+        let s=Math.floor((Date.now()-loginTime)/1000);
+        timeOnline.innerText=`⏱️ ${Math.floor(s/60)}m ${s%60}s`;
+    },1000);
 }
 
-function register() {
-    const user = document.getElementById("regUser").value;
-    const pass = document.getElementById("regPass").value;
-
-    if (!user || !pass) {
-        alert("Preencha tudo");
-        return;
-    }
-
-    if (userData[user]) {
-        alert("Usuário já existe");
-        return;
-    }
-
-    userData[user] = pass;
-    localStorage.setItem("users", JSON.stringify(userData));
-    enterSite();
+/* MOEDAS */
+function coinsEl(){
+    coins=parseInt(localStorage.getItem("coins_"+loggedUser))||0;
+    coinsDiv.innerText="💰 "+coins;
+    coinsDiv.classList.remove("hidden");
+}
+const coinsDiv=document.getElementById("coins");
+function startCoins(){
+    coinTimer=setInterval(()=>{
+        coins++;
+        localStorage.setItem("coins_"+loggedUser,coins);
+        coinsDiv.innerText="💰 "+coins;
+    },1000);
 }
 
-function login() {
-    const user = document.getElementById("loginUser").value;
-    const pass = document.getElementById("loginPass").value;
-
-    if (userData[user] === pass) {
-        enterSite();
-    } else {
-        alert("Conta ou senha errada");
-    }
+/* LOJA */
+function buyBorder(p){
+    if(coins<p) return showAlert();
+    coins-=p;
+    avatarImg.style.border=`3px solid hsl(${Math.random()*360},100%,50%)`;
+    localStorage.setItem("coins_"+loggedUser,coins);
 }
 
-function enterSite() {
-    hideAll();
-    document.getElementById("site").classList.remove("hidden");
+function buyPrize(){
+    if(coins<5000) return showAlert();
+    coins-=5000;
+    alert("🎉 Prêmio conquistado!");
+    localStorage.setItem("coins_"+loggedUser,coins);
 }
 
-function logout() {
-    backMenu();
+function showAlert(){
+    alertMini.style.display="block";
+    setTimeout(()=>alertMini.style.display="none",2000);
 }
 
-// 🔗 REDIRECIONA PARA O SITE EXPLICANDO GAMES
-function irParaJogos() {
-    window.location.href = "https://rodolfo472.github.io/explicandogames/";
+/* AVATAR */
+function setAvatar(){
+    let f=avatarInput.files[0];
+    let r=new FileReader();
+    r.onload=()=>{ avatarImg.src=r.result; localStorage.setItem("avatar_"+loggedUser,r.result); };
+    r.readAsDataURL(f);
+}
+function loadAvatar(u){
+    let a=localStorage.getItem("avatar_"+u);
+    if(a) avatarImg.src=a;
+}
+
+/* RANKING */
+function toggleRanking(){
+    rankingBox.classList.toggle("hidden");
+    updateRanking();
+}
+function updateRanking(){
+    rankingList.innerHTML="";
+    let r=[];
+    for(let k in localStorage)
+        if(k.startsWith("coins_"))
+            r.push({u:k.replace("coins_",""),c:+localStorage[k]});
+    r.sort((a,b)=>b.c-a.c);
+    r.slice(0,10).forEach((e,i)=>{
+        rankingList.innerHTML+=`<li>${i+1}. ${e.u} 💰${e.c}</li>`;
+    });
+}
+
+function irParaJogos(){
+    window.location.href="https://rodolfo472.github.io/explicandogames/";
 }
 </script>
 
