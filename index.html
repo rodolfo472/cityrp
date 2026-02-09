@@ -73,7 +73,7 @@ button:hover {
 
     <!-- REGISTRO -->
     <div id="stepRegister" class="hidden">
-        <h2>📝 Registrar</h2>
+        <h2>📝 Criar conta</h2>
         <input id="regUser" placeholder="Nome da conta">
         <input type="password" id="regPass" placeholder="Senha">
         <button onclick="register()">Criar conta</button>
@@ -87,7 +87,6 @@ button:hover {
         <p>Você entrou com sucesso.</p>
 
         <button onclick="irParaJogos()">Explorar jogos 🎮</button>
-
         <button onclick="logout()">Sair</button>
     </div>
 
@@ -96,6 +95,13 @@ button:hover {
 <script>
 // carrega usuários salvos
 let userData = JSON.parse(localStorage.getItem("users")) || {};
+
+function hideAll() {
+    document.getElementById("stepMenu").classList.add("hidden");
+    document.getElementById("stepLogin").classList.add("hidden");
+    document.getElementById("stepRegister").classList.add("hidden");
+    document.getElementById("site").classList.add("hidden");
+}
 
 function showLogin() {
     hideAll();
@@ -137,4 +143,24 @@ function login() {
 
     if (userData[user] === pass) {
         enterSite();
+    } else {
+        alert("Conta ou senha errada");
     }
+}
+
+function enterSite() {
+    hideAll();
+    document.getElementById("site").classList.remove("hidden");
+}
+
+function logout() {
+    backMenu();
+}
+
+function irParaJogos() {
+    window.location.href = "https://rodolfo472.github.io/Games";
+}
+</script>
+
+</body>
+</html>
