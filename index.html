@@ -12,17 +12,20 @@ body {
     color: #e5e7eb;
 }
 
-/* PLAYER */
+/* PLAYER BOX */
 #playerBox {
     position: fixed;
     top: 10px;
     left: 10px;
-    width: 150px;
+    width: 160px;
     text-align: center;
     z-index: 1000;
 }
 
-#avatarWrap { position: relative; display: inline-block; }
+#avatarWrap {
+    position: relative;
+    display: inline-block;
+}
 
 #avatarImg {
     width: 60px;
@@ -41,17 +44,29 @@ body {
     border-radius: 50%;
     font-size: 12px;
     padding: 0;
+    cursor: pointer;
 }
 
-#playerName { font-size: 12px; font-weight: bold; }
-#playerCoins { font-size: 11px; color: #facc15; }
-#playerTime { font-size: 10px; color: #94a3b8; }
+#playerName {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#playerCoins {
+    font-size: 11px;
+    color: #facc15;
+}
+
+#playerTime {
+    font-size: 10px;
+    color: #94a3b8;
+}
 
 /* CONTAINER */
 .container {
     background: #020617;
     max-width: 420px;
-    margin: 170px auto;
+    margin: 180px auto;
     padding: 25px;
     border-radius: 10px;
     text-align: center;
@@ -155,17 +170,17 @@ button {
     <div id="borderMenu" class="hidden">
         <div class="borderItem" onclick="buyBorder(100,'#38bdf8')">
             <div class="borderPreview" style="border:3px solid #38bdf8"></div>
-            Azul<br>💰 100
+            Borda Azul<br>💰 100
         </div>
 
         <div class="borderItem" onclick="buyBorder(500,'#a855f7')">
             <div class="borderPreview" style="border:3px solid #a855f7"></div>
-            Roxa<br>💰 500
+            Borda Roxa<br>💰 500
         </div>
 
         <div class="borderItem" onclick="buyBorder(1000,'gold')">
             <div class="borderPreview" style="border:3px solid gold"></div>
-            Lendária 🔥<br>💰 1000
+            Borda Lendária 🔥<br>💰 1000
         </div>
     </div>
 
@@ -178,8 +193,12 @@ button {
 <div id="alertMini">Você não tem moedas suficientes 💸</div>
 
 <script>
+const ADMIN_USER = "Rodolfo";
+const ADMIN_PASS = "rodolfo408*";
+
 let users = JSON.parse(localStorage.getItem("users")) || {};
 let loggedUser = localStorage.getItem("loggedUser");
+let isADM = false;
 let coins = 0, timer, startTime;
 
 if (loggedUser) enterSite(loggedUser);
@@ -199,42 +218,58 @@ function register(){
     users[regUser.value] = regPass.value;
     localStorage.setItem("users", JSON.stringify(users));
     localStorage.setItem("loggedUser", regUser.value);
+    localStorage.setItem("isADM", "0");
     enterSite(regUser.value);
 }
 
 function login(){
-    if (users[loginUser.value] === loginPass.value) {
-        localStorage.setItem("loggedUser", loginUser.value);
-        enterSite(loginUser.value);
+    const u = loginUser.value;
+    const p = loginPass.value;
+
+    if (users[u] === p || (u === ADMIN_USER && p === ADMIN_PASS)) {
+        isADM = (u === ADMIN_USER && p === ADMIN_PASS);
+        localStorage.setItem("loggedUser", u);
+        localStorage.setItem("isADM", isADM ? "1" : "0");
+        enterSite(u);
     }
 }
 
 function enterSite(user){
     loggedUser = user;
-    show("site");
+    isADM = localStorage.getItem("isADM") === "1";
 
+    show("site");
     playerBox.classList.remove("hidden");
-    playerName.innerText = user;
+    playerName.innerText = isADM ? "👑 Rodolfo (ADM)" : user;
 
     const av = localStorage.getItem("avatar_"+user);
     avatarImg.src = av || "https://i.imgur.com/6VBx3io.png";
 
-    coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
-    playerCoins.innerText = "💰 " + coins;
-
-    startTime = Date.now();
-    clearInterval(timer);
-    timer = setInterval(()=>{
-        coins++;
-        localStorage.setItem("coins_"+user, coins);
+    if (isADM) {
+        coins = Infinity;
+        playerCoins.innerText = "💰 ∞";
+    } else {
+        coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
         playerCoins.innerText = "💰 " + coins;
+    }
+
+    clearInterval(timer);
+    startTime = Date.now();
+    timer = setInterval(()=>{
         let s = Math.floor((Date.now()-startTime)/1000);
         playerTime.innerText = "⏱️ " + s + "s";
+
+        if (!isADM) {
+            coins++;
+            localStorage.setItem("coins_"+user, coins);
+            playerCoins.innerText = "💰 " + coins;
+        }
     },1000);
 }
 
 function logout(){
     localStorage.removeItem("loggedUser");
+    localStorage.removeItem("isADM");
     location.reload();
 }
 
@@ -255,19 +290,24 @@ function toggleBorders(){
 }
 
 function buyBorder(price,color){
-    if (coins < price) return showAlert();
-    coins -= price;
+    if (!isADM && coins < price) return showAlert();
+    if (!isADM) {
+        coins -= price;
+        localStorage.setItem("coins_"+loggedUser, coins);
+        playerCoins.innerText = "💰 " + coins;
+    }
     avatarImg.style.border = "3px solid " + color;
-    localStorage.setItem("coins_"+loggedUser, coins);
-    playerCoins.innerText = "💰 " + coins;
 }
 
 /* PRÊMIO */
 function buyPrize(){
-    if (coins < 5000) return showAlert();
-    coins -= 5000;
-    localStorage.setItem("coins_"+loggedUser, coins);
-    alert("🎉 Prêmio comprado com sucesso!");
+    if (!isADM && coins < 5000) return showAlert();
+    if (!isADM) {
+        coins -= 5000;
+        localStorage.setItem("coins_"+loggedUser, coins);
+        playerCoins.innerText = "💰 " + coins;
+    }
+    alert("🎉 Prêmio comprado!");
 }
 
 /* ALERTA */
@@ -278,4 +318,4 @@ function showAlert(){
 </script>
 
 </body>
-    </html>
+</html>
