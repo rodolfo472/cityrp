@@ -2,139 +2,89 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sistema Gamer</title>
+<title>Player Box</title>
 
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: #e5e7eb;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(#020b1c, #000814);
+  color: #fff;
 }
 
-/* PLAYER */
+/* PLAYER BOX */
 #playerBox {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    width: 180px;
-    text-align: center;
-    z-index: 1000;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 180px;
+  background: #06172f;
+  padding: 10px;
+  border-radius: 0px; /* quadrada */
+  text-align: center;
+  z-index: 10;
 }
 
+/* AVATAR */
 #avatarWrapper {
-    width: 74px;
-    height: 74px;
-    padding: 4px;
-    border-radius: 6px;
-    background: #1e293b;
-    margin: auto;
-    position: relative;
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: auto;
 }
 
-#avatarImg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
+/* COBRA ADM */
+.adm-snake::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 0;
+  background: linear-gradient(
+    90deg,
+    #00ff88,
+    #00ffaa,
+    #00ff88
+  );
+  filter: blur(6px);
+  animation: snake 2s linear infinite;
 }
 
-/* 🐍 BORDA ADM COBRA NEON */
-.adm-snake {
-    background: linear-gradient(
-        0deg,
-        #00ff66,
-        #00cc44,
-        #00ff66,
-        #00aa33
-    );
-    background-size: 400% 400%;
-    animation: snakeMove 2.5s linear infinite;
-    box-shadow:
-        0 0 8px #00ff66,
-        0 0 16px #00ff66,
-        inset 0 0 10px #00aa33;
+@keyframes snake {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-@keyframes snakeMove {
-    0%   { background-position: 0% 50%; }
-    25%  { background-position: 50% 100%; }
-    50%  { background-position: 100% 50%; }
-    75%  { background-position: 50% 0%; }
-    100% { background-position: 0% 50%; }
+#avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 0;
+  position: relative;
+  z-index: 2;
 }
 
-/* botão foto */
-#changeAvatarBtn {
-    position: absolute;
-    bottom: -6px;
-    right: -6px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    font-size: 12px;
-    cursor: pointer;
-}
-
-/* INFO */
-#playerName { font-size: 12px; font-weight: bold; }
-#playerCoins { font-size: 11px; color: #facc15; }
-#playerTime { font-size: 10px; color: #94a3b8; }
-
-/* CONTAINER */
-.container {
-    background: #020617;
-    max-width: 420px;
-    margin: 220px auto;
-    padding: 25px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-button, input {
-    width: 90%;
-    padding: 10px;
-    margin: 6px 0;
-    border-radius: 6px;
-    border: none;
-}
-
+/* BOTÕES */
 button {
-    background: #38bdf8;
-    font-weight: bold;
-    cursor: pointer;
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #00aaff;
+  color: #000;
+  font-weight: bold;
 }
 
-.hidden { display: none; }
-
-/* ADM */
-#adminBtn {
-    position: fixed;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: gold;
-    color: black;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 22px;
-    display: none;
-    z-index: 1000;
+/* MENUS */
+.menu {
+  background: #021024;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-#adminPanel {
-    position: fixed;
-    right: 80px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #020617;
-    border: 2px solid gold;
-    border-radius: 10px;
-    padding: 15px;
-    width: 200px;
-    display: none;
-    z-index: 1000;
+.hidden {
+  display: none;
 }
 </style>
 </head>
@@ -142,193 +92,85 @@ button {
 <body>
 
 <!-- PLAYER -->
-<div id="playerBox" class="hidden">
-    <div id="avatarWrapper">
-        <img id="avatarImg">
-        <button id="changeAvatarBtn" onclick="openAvatar()">📷</button>
-    </div>
-    <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="saveAvatar()">
-    <div id="playerName"></div>
-    <div id="playerCoins"></div>
-    <div id="playerTime"></div>
+<div id="playerBox">
+  <div id="avatarWrapper">
+    <img id="avatar" src="https://i.imgur.com/6VBx3io.png">
+  </div>
+  <div id="playerName"></div>
+  <div id="playerCoins"></div>
+
+  <button onclick="toggleMenu('shop')">🟦 Bordas</button>
+  <button onclick="toggleMenu('admin')" id="adminBtn">👑 Painel ADM</button>
 </div>
 
-<!-- ADM -->
-<button id="adminBtn" onclick="toggleAdmin()">👑</button>
-
-<div id="adminPanel">
-    <h4>👑 Painel ADM</h4>
-    <input id="giveUser" placeholder="Jogador">
-    <input id="giveCoins" type="number" placeholder="Moedas">
-    <button onclick="giveMoney()">Dar dinheiro</button>
+<!-- MENU BORDAS -->
+<div id="shop" class="menu hidden">
+  <h3>Bordas</h3>
+  <button onclick="buyBorder(100)">Borda Azul – 100</button>
+  <button onclick="buyBorder(500)">Borda Roxa – 500</button>
 </div>
 
-<div class="container">
-
-<div id="menu">
-    <button onclick="showLogin()">Login</button>
-    <button onclick="showRegister()">Registrar</button>
-</div>
-
-<div id="loginBox" class="hidden">
-    <input id="loginUser" placeholder="Usuário">
-    <input type="password" id="loginPass" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-</div>
-
-<div id="registerBox" class="hidden">
-    <input id="regUser" placeholder="Usuário">
-    <input type="password" id="regPass" placeholder="Senha">
-    <button onclick="register()">Criar conta</button>
-</div>
-
-<div id="site" class="hidden">
-    <h2>🎮 Bem-vindo</h2>
-    <button onclick="logout()">Sair</button>
-</div>
-
+<!-- PAINEL ADM -->
+<div id="admin" class="menu hidden">
+  <h3>👑 Painel do ADM</h3>
+  <button onclick="giveMoney(1000)">Dar +1000</button>
+  <button onclick="giveMoney(100000)">Dar +100000</button>
 </div>
 
 <script>
-const ADMIN_USER = "Rodolfo";
-const ADMIN_PASS = "rodolfo408*";
-
-let users = JSON.parse(localStorage.getItem("users")) || {};
-let loggedUser = localStorage.getItem("loggedUser");
-let isADM = false;
-let coins = 0, timer, startTime;
-let attempts = {};
-
-/* INIT */
-if (loggedUser) {
-    enterSite(loggedUser);
-} else {
-    show("menu");
-}
-
-/* TELAS */
-function show(id){
-    ["menu","loginBox","registerBox","site"].forEach(e=>{
-        document.getElementById(e).classList.add("hidden");
-    });
-    document.getElementById(id).classList.remove("hidden");
-}
-
-function showLogin(){ show("loginBox"); }
-function showRegister(){ show("registerBox"); }
-
-/* REGISTRO */
-function register(){
-    const u = regUser.value.trim();
-    const p = regPass.value.trim();
-
-    if (!u || !p) return alert("Preencha tudo");
-
-    if (users[u]) return alert("Nome já existe");
-
-    for (let k in users) {
-        if (users[k] === p) return alert("Senha já existe");
-    }
-
-    users[u] = p;
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("loggedUser", u);
-    localStorage.setItem("isADM", "0");
-    enterSite(u);
-}
+/* CONFIG */
+const ADM_NAME = "Rodolfo";
 
 /* LOGIN */
-function login(){
-    const u = loginUser.value;
-    const p = loginPass.value;
+const user = "Rodolfo"; // simula login
+let coins = Number(localStorage.getItem("coins_"+user)) || 0;
+const isADM = user === ADM_NAME;
 
-    attempts[u] = attempts[u] || 0;
-    if (attempts[u] >= 3) return alert("Conta bloqueada");
+/* ELEMENTOS */
+const nameEl = document.getElementById("playerName");
+const coinsEl = document.getElementById("playerCoins");
+const adminBtn = document.getElementById("adminBtn");
+const avatarWrapper = document.getElementById("avatarWrapper");
 
-    if (users[u] === p || (u === ADMIN_USER && p === ADMIN_PASS)) {
-        isADM = (u === ADMIN_USER && p === ADMIN_PASS);
-        localStorage.setItem("loggedUser", u);
-        localStorage.setItem("isADM", isADM ? "1" : "0");
-        attempts[u] = 0;
-        enterSite(u);
-    } else {
-        attempts[u]++;
-        alert("Senha errada (" + attempts[u] + "/3)");
-    }
+/* SETUP */
+nameEl.innerText = isADM ? "👑 Rodolfo (ADM)" : user;
+
+if (isADM) {
+  coins = Infinity;
+  avatarWrapper.classList.add("adm-snake");
+  adminBtn.classList.remove("hidden");
+} else {
+  adminBtn.classList.add("hidden");
 }
 
-/* SITE */
-function enterSite(user){
-    loggedUser = user;
-    isADM = localStorage.getItem("isADM") === "1";
+updateCoins();
 
-    show("site");
-    playerBox.classList.remove("hidden");
-
-    playerName.innerText = isADM ? "👑 Rodolfo (ADM)" : user;
-
-    const av = localStorage.getItem("avatar_"+user);
-    avatarImg.src = av || "https://i.imgur.com/6VBx3io.png";
-
-    avatarWrapper.classList.toggle("adm-snake", isADM);
-
-    if (isADM) {
-        coins = Infinity;
-        playerCoins.innerText = "💰 ∞";
-        adminBtn.style.display = "block";
-    } else {
-        coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
-        playerCoins.innerText = "💰 " + coins;
-        adminBtn.style.display = "none";
-    }
-
-    clearInterval(timer);
-    startTime = Date.now();
-    timer = setInterval(()=>{
-        let s = Math.floor((Date.now()-startTime)/1000);
-        playerTime.innerText = "⏱️ " + s + "s";
-
-        if (!isADM) {
-            coins++;
-            localStorage.setItem("coins_"+user, coins);
-            playerCoins.innerText = "💰 " + coins;
-        }
-    },1000);
+/* FUNÇÕES */
+function updateCoins() {
+  coinsEl.innerText = "💰 " + (coins === Infinity ? "∞" : coins);
+  localStorage.setItem("coins_"+user, coins);
 }
 
-/* ADM */
-function toggleAdmin(){
-    adminPanel.style.display =
-        adminPanel.style.display === "block" ? "none" : "block";
+function toggleMenu(id) {
+  document.getElementById(id).classList.toggle("hidden");
 }
 
-function giveMoney(){
-    const u = giveUser.value;
-    const v = parseInt(giveCoins.value);
-    if (!u || isNaN(v)) return;
-    const current = parseInt(localStorage.getItem("coins_"+u)) || 0;
-    localStorage.setItem("coins_"+u, current + v);
-    alert("💰 Dinheiro enviado!");
+function buyBorder(price) {
+  if (coins === Infinity || coins >= price) {
+    alert("Borda comprada!");
+    if (coins !== Infinity) coins -= price;
+    updateCoins();
+  } else {
+    alert("Sem dinheiro!");
+  }
 }
 
-/* AVATAR */
-function openAvatar(){ avatarInput.click(); }
-function saveAvatar(){
-    const r = new FileReader();
-    r.onload = () => {
-        avatarImg.src = r.result;
-        localStorage.setItem("avatar_"+loggedUser, r.result);
-    };
-    r.readAsDataURL(avatarInput.files[0]);
-}
-
-/* LOGOUT */
-function logout(){
-    localStorage.removeItem("loggedUser");
-    localStorage.removeItem("isADM");
-    location.reload();
+function giveMoney(value) {
+  if (!isADM) return;
+  if (coins !== Infinity) coins += value;
+  updateCoins();
 }
 </script>
 
 </body>
- </html>
+</html>
