@@ -5,101 +5,92 @@
 <title>Sistema Gamer</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(#020b1c, #000814);
-  color: #fff;
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#020b1c;
+  color:#fff;
 }
 
 /* PLAYER BOX */
-#playerBox {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  width: 190px;
-  background: #06172f;
-  padding: 10px;
-  text-align: center;
-  z-index: 10;
+#playerBox{
+  position:fixed;
+  top:10px;
+  left:10px;
+  width:200px;
+  background:#06172f;
+  padding:10px;
 }
 
 /* AVATAR */
-#avatarWrapper {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  margin: auto;
+#avatarWrapper{
+  position:relative;
+  width:90px;
+  height:90px;
+  margin:auto;
 }
 
 /* COBRA ADM */
-.adm-snake::before {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 0;
-  background: linear-gradient(90deg,#00ff88,#00ffaa,#00ff88);
-  filter: blur(6px);
-  animation: snake 2s linear infinite;
+.adm-snake::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  background:linear-gradient(90deg,#00ff88,#00ffaa,#00ff88);
+  filter:blur(6px);
+  animation:snake 2s linear infinite;
+}
+@keyframes snake{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
 }
 
-@keyframes snake {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+#avatar{
+  width:90px;
+  height:90px;
+  position:relative;
+  z-index:2;
 }
 
-#avatar {
-  width: 90px;
-  height: 90px;
-  border-radius: 0;
-  position: relative;
-  z-index: 2;
-}
-
-/* BOTÃO FOTO */
-#photoBtn {
-  position: absolute;
-  bottom: -6px;
-  right: -6px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #00aaff;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
+#photoBtn{
+  position:absolute;
+  bottom:-6px;
+  right:-6px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  cursor:pointer;
 }
 
 /* INFO */
-#playerName { font-weight: bold; }
-#playerCoins { color: gold; font-size: 14px; }
-#playerTime { font-size: 12px; }
+#playerName{font-weight:bold}
+.premium{
+  color:#00ffaa;
+  text-shadow:0 0 8px #00ffaa;
+}
+#playerCoins{color:gold}
+#playerTime{font-size:12px}
 
 /* BOTÕES */
-button {
-  width: 100%;
-  margin-top: 6px;
-  padding: 8px;
-  border: none;
-  cursor: pointer;
-  background: #00aaff;
-  font-weight: bold;
+button{
+  width:100%;
+  margin-top:5px;
+  padding:6px;
+  cursor:pointer;
 }
 
 /* MENUS */
-.menu {
-  position: fixed;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #021024;
-  padding: 10px;
-  width: 200px;
-  border-radius: 8px;
-  display: none;
+.menu{
+  position:fixed;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  background:#021024;
+  padding:10px;
+  width:220px;
+  display:none;
 }
 
-.hidden { display: none; }
+.hidden{display:none}
 </style>
 </head>
 
@@ -109,127 +100,158 @@ button {
 <div id="playerBox">
   <div id="avatarWrapper">
     <img id="avatar" src="https://i.imgur.com/6VBx3io.png">
-    <button id="photoBtn" onclick="openPhoto()">📷</button>
+    <button id="photoBtn">📷</button>
   </div>
-
   <div id="playerName"></div>
+  <div id="playerPremium"></div>
   <div id="playerCoins"></div>
   <div id="playerTime"></div>
 
-  <button onclick="toggleMenu('prizeMenu')">🏆 Prêmio</button>
-  <button onclick="toggleMenu('adminMenu')" id="adminBtn">👑 ADM</button>
+  <button onclick="toggleMenu('shop')">🎨 Bordas</button>
+  <button onclick="toggleMenu('inventory')">🎒 Inventário</button>
+  <button onclick="toggleMenu('prize')">🏆 Prêmio</button>
+  <button onclick="toggleMenu('admin')" id="adminBtn">👑 ADM</button>
 </div>
 
-<input type="file" id="photoInput" accept="image/*" class="hidden">
+<input type="file" id="photoInput" class="hidden" accept="image/*">
+
+<!-- LOJA -->
+<div id="shop" class="menu">
+  <h3>Bordas</h3>
+  <button onclick="buyBorder('Azul',100)">Azul – 100</button>
+  <button onclick="buyBorder('Roxa',500)">Roxa – 500</button>
+</div>
+
+<!-- INVENTÁRIO -->
+<div id="inventory" class="menu">
+  <h3>🎒 Inventário</h3>
+  <ul id="invList"></ul>
+</div>
 
 <!-- PRÊMIO -->
-<div id="prizeMenu" class="menu">
-  <h3>🏆 Prêmio</h3>
-  <button onclick="buyPrize()">Comprar prêmio (5000)</button>
+<div id="prize" class="menu">
+  <h3>🏆 Premium</h3>
+  <button onclick="buyPremium()">Comprar Premium (5000)</button>
 </div>
 
 <!-- ADM -->
-<div id="adminMenu" class="menu">
-  <h3>👑 Painel ADM</h3>
+<div id="admin" class="menu">
+  <h3>👑 ADM</h3>
   <input id="giveUser" placeholder="Jogador">
   <input id="giveValue" type="number" placeholder="Moedas">
   <button onclick="giveMoney()">Dar dinheiro</button>
 </div>
 
 <script>
-const ADMIN_NAME = "Rodolfo";
-const ADMIN_PASS = "rodolfo408*";
+/* CONFIG */
+const ADMIN="Rodolfo";
+let user="Rodolfo"; // simula login
+let isADM=user===ADMIN;
 
-/* LOGIN FIXO PARA TESTE (ADM) */
-let user = "Rodolfo";
-let pass = "rodolfo408*";
-
-let isADM = user === ADMIN_NAME && pass === ADMIN_PASS;
-
-/* MOEDAS E TEMPO */
-let coins = isADM ? Infinity : Number(localStorage.getItem("coins_"+user)) || 0;
-let totalTime = Number(localStorage.getItem("time_"+user)) || 0;
+/* DADOS */
+let coins=isADM?Infinity:Number(localStorage.getItem("coins_"+user))||0;
+let time=Number(localStorage.getItem("time_"+user))||0;
+let inventory=JSON.parse(localStorage.getItem("inv_"+user))||[];
+let premium=localStorage.getItem("premium_"+user)==="1";
 
 /* ELEMENTOS */
-const nameEl = document.getElementById("playerName");
-const coinsEl = document.getElementById("playerCoins");
-const timeEl = document.getElementById("playerTime");
-const avatar = document.getElementById("avatar");
-const avatarWrapper = document.getElementById("avatarWrapper");
+const nameEl=playerName;
+const premEl=playerPremium;
+const coinsEl=playerCoins;
+const timeEl=playerTime;
+const avatar=document.getElementById("avatar");
+const avatarWrapper=document.getElementById("avatarWrapper");
+const invList=document.getElementById("invList");
 
 /* SETUP */
-nameEl.innerText = isADM ? "👑 Rodolfo (ADM)" : user;
-coinsEl.innerText = "💰 " + (isADM ? "∞" : coins);
-timeEl.innerText = "⏱️ " + totalTime + "s";
-
-if (isADM) {
-  avatarWrapper.classList.add("adm-snake");
-  document.getElementById("adminBtn").classList.remove("hidden");
-} else {
-  document.getElementById("adminBtn").classList.add("hidden");
+nameEl.innerText=user;
+if(premium){
+  premEl.innerText="⭐ Premium";
+  nameEl.classList.add("premium");
 }
+coinsEl.innerText="💰 "+(isADM?"∞":coins);
+timeEl.innerText="⏱️ "+time+"s";
+if(isADM) avatarWrapper.classList.add("adm-snake");
 
 /* FOTO */
-const savedPhoto = localStorage.getItem("avatar_"+user);
-if (savedPhoto) avatar.src = savedPhoto;
+const savedPhoto=localStorage.getItem("avatar_"+user);
+if(savedPhoto) avatar.src=savedPhoto;
 
-function openPhoto() {
-  document.getElementById("photoInput").click();
-}
-
-document.getElementById("photoInput").onchange = e => {
-  const reader = new FileReader();
-  reader.onload = () => {
-    avatar.src = reader.result;
-    localStorage.setItem("avatar_"+user, reader.result);
-  };
-  reader.readAsDataURL(e.target.files[0]);
+photoBtn.onclick=()=>photoInput.click();
+photoInput.onchange=e=>{
+  const r=new FileReader();
+  r.onload=()=>{avatar.src=r.result;localStorage.setItem("avatar_"+user,r.result);}
+  r.readAsDataURL(e.target.files[0]);
 };
 
 /* LOOP */
-setInterval(() => {
-  totalTime++;
-  localStorage.setItem("time_"+user, totalTime);
-  timeEl.innerText = "⏱️ " + totalTime + "s";
-
-  if (!isADM) {
+setInterval(()=>{
+  time++;
+  localStorage.setItem("time_"+user,time);
+  timeEl.innerText="⏱️ "+time+"s";
+  if(!isADM){
     coins++;
-    localStorage.setItem("coins_"+user, coins);
-    coinsEl.innerText = "💰 " + coins;
+    localStorage.setItem("coins_"+user,coins);
+    coinsEl.innerText="💰 "+coins;
   }
-}, 1000);
+},1000);
 
 /* MENUS */
-function toggleMenu(id) {
-  document.getElementById(id).style.display =
-    document.getElementById(id).style.display === "block" ? "none" : "block";
+function toggleMenu(id){
+  document.getElementById(id).style.display=
+    document.getElementById(id).style.display==="block"?"none":"block";
 }
 
-/* PRÊMIO */
-function buyPrize() {
-  if (isADM) {
-    alert("ADM já tem tudo 😎");
-    return;
+/* BORDAS */
+function buyBorder(name,price){
+  if(!isADM && coins<price) return alert("Sem moedas");
+  if(!inventory.includes(name)){
+    inventory.push(name);
+    localStorage.setItem("inv_"+user,JSON.stringify(inventory));
   }
-  if (coins < 5000) {
-    alert("❌ Moedas insuficientes");
-    return;
+  if(!isADM){
+    coins-=price;
+    localStorage.setItem("coins_"+user,coins);
+    coinsEl.innerText="💰 "+coins;
   }
-  coins -= 5000;
-  localStorage.setItem("coins_"+user, coins);
-  coinsEl.innerText = "💰 " + coins;
-  alert("🎉 Prêmio comprado!");
+  updateInv();
+}
+
+/* INVENTÁRIO */
+function updateInv(){
+  invList.innerHTML="";
+  inventory.forEach(i=>{
+    const li=document.createElement("li");
+    li.innerText=i;
+    invList.appendChild(li);
+  });
+}
+updateInv();
+
+/* PREMIUM */
+function buyPremium(){
+  if(premium) return;
+  if(!isADM && coins<5000) return alert("Sem moedas");
+  premium=true;
+  localStorage.setItem("premium_"+user,"1");
+  premEl.innerText="⭐ Premium";
+  nameEl.classList.add("premium");
+  if(!isADM){
+    coins-=5000;
+    localStorage.setItem("coins_"+user,coins);
+    coinsEl.innerText="💰 "+coins;
+  }
 }
 
 /* ADM */
-function giveMoney() {
-  if (!isADM) return;
-  const target = document.getElementById("giveUser").value;
-  const value = Number(document.getElementById("giveValue").value);
-  if (!target || !value) return;
-  const current = Number(localStorage.getItem("coins_"+target)) || 0;
-  localStorage.setItem("coins_"+target, current + value);
-  alert("💰 Dinheiro enviado!");
+function giveMoney(){
+  if(!isADM) return;
+  const u=giveUser.value;
+  const v=Number(giveValue.value);
+  if(!u||!v) return;
+  const c=Number(localStorage.getItem("coins_"+u))||0;
+  localStorage.setItem("coins_"+u,c+v);
+  alert("Dinheiro enviado");
 }
 </script>
 
