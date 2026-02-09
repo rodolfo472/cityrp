@@ -44,23 +44,8 @@ button {
 
 <div class="container">
 
-    <!-- EMAIL -->
-    <div id="stepEmail">
-        <h2>📧 Digite seu e-mail</h2>
-        <input type="email" id="email" placeholder="seuemail@email.com">
-        <button onclick="sendCode()">Enviar código</button>
-        <p id="codeInfo"></p>
-    </div>
-
-    <!-- CODIGO -->
-    <div id="stepCode" class="hidden">
-        <h2>🔐 Digite o código</h2>
-        <input type="number" id="codeInput" placeholder="Código de 6 dígitos">
-        <button onclick="verifyCode()">Verificar</button>
-    </div>
-
     <!-- MENU -->
-    <div id="stepMenu" class="hidden">
+    <div id="stepMenu">
         <h2>Conta</h2>
         <button onclick="showLogin()">Já sou cadastrado</button>
         <button onclick="showRegister()">Registrar</button>
@@ -72,6 +57,7 @@ button {
         <input id="loginUser" placeholder="Nome da conta">
         <input type="password" id="loginPass" placeholder="Senha">
         <button onclick="login()">Entrar</button>
+        <button onclick="backMenu()">Voltar</button>
     </div>
 
     <!-- REGISTRO -->
@@ -80,60 +66,60 @@ button {
         <input id="regUser" placeholder="Nome da conta">
         <input type="password" id="regPass" placeholder="Senha">
         <button onclick="register()">Criar conta</button>
+        <button onclick="backMenu()">Voltar</button>
     </div>
 
     <!-- SITE -->
     <div id="site" class="hidden">
         <h1>🎮 Bem-vindo ao site sobre jogos!</h1>
         <p>Você entrou com sucesso.</p>
+        <button onclick="logout()">Sair</button>
     </div>
 
 </div>
 
 <script>
-let generatedCode = "";
-let userData = {};
-
-function sendCode() {
-    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById("codeInfo").innerText =
-        "Código enviado (simulado): " + generatedCode;
-    document.getElementById("stepEmail").classList.add("hidden");
-    document.getElementById("stepCode").classList.remove("hidden");
-}
-
-function verifyCode() {
-    const input = document.getElementById("codeInput").value;
-    if (input === generatedCode) {
-        document.getElementById("stepCode").classList.add("hidden");
-        document.getElementById("stepMenu").classList.remove("hidden");
-    } else {
-        alert("Código errado");
-    }
-}
+// carrega usuários salvos
+let userData = JSON.parse(localStorage.getItem("users")) || {};
 
 function showLogin() {
-    document.getElementById("stepMenu").classList.add("hidden");
+    hideAll();
     document.getElementById("stepLogin").classList.remove("hidden");
 }
 
 function showRegister() {
-    document.getElementById("stepMenu").classList.add("hidden");
+    hideAll();
     document.getElementById("stepRegister").classList.remove("hidden");
+}
+
+function backMenu() {
+    hideAll();
+    document.getElementById("stepMenu").classList.remove("hidden");
 }
 
 function register() {
     const user = document.getElementById("regUser").value;
     const pass = document.getElementById("regPass").value;
-    if (user && pass) {
-        userData[user] = pass;
-        enterSite();
+
+    if (!user || !pass) {
+        alert("Preencha tudo");
+        return;
     }
+
+    if (userData[user]) {
+        alert("Usuário já existe");
+        return;
+    }
+
+    userData[user] = pass;
+    localStorage.setItem("users", JSON.stringify(userData));
+    enterSite();
 }
 
 function login() {
     const user = document.getElementById("loginUser").value;
     const pass = document.getElementById("loginPass").value;
+
     if (userData[user] === pass) {
         enterSite();
     } else {
@@ -142,8 +128,17 @@ function login() {
 }
 
 function enterSite() {
-    document.querySelectorAll(".container > div").forEach(d => d.classList.add("hidden"));
+    hideAll();
     document.getElementById("site").classList.remove("hidden");
+}
+
+function logout() {
+    backMenu();
+}
+
+function hideAll() {
+    document.querySelectorAll(".container > div")
+        .forEach(d => d.classList.add("hidden"));
 }
 </script>
 
