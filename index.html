@@ -1,126 +1,151 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Aprendendo Sobre Jogos</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #e5e7eb;
-        }
+<meta charset="UTF-8">
+<title>Sistema de Acesso</title>
 
-        header {
-            background: #020617;
-            padding: 20px;
-            text-align: center;
-        }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+    text-align: center;
+}
 
-        header h1 {
-            margin: 0;
-            color: #38bdf8;
-        }
+.container {
+    background: #020617;
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 25px;
+    border-radius: 10px;
+}
 
-        section {
-            padding: 30px;
-            max-width: 900px;
-            margin: auto;
-        }
+input, button {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: none;
+}
 
-        h2 {
-            color: #7dd3fc;
-        }
+button {
+    background: #38bdf8;
+    cursor: pointer;
+    font-weight: bold;
+}
 
-        .card {
-            background: #020617;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
-
-        footer {
-            background: #020617;
-            text-align: center;
-            padding: 15px;
-            color: #94a3b8;
-        }
-    </style>
+.hidden {
+    display: none;
+}
+</style>
 </head>
+
 <body>
 
-<header>
-    <h1>🎮 Aprendendo Sobre Jogos</h1>
-    <p>Um site simples explicando como jogos funcionam</p>
-</header>
+<div class="container">
 
-<section>
-
-    <div class="card">
-        <h2>O que é um jogo?</h2>
-        <p>
-            Um jogo é uma experiência interativa onde o jogador controla personagens,
-            toma decisões e enfrenta desafios. Jogos podem ser feitos para diversão,
-            aprendizado ou competição.
-        </p>
+    <!-- EMAIL -->
+    <div id="stepEmail">
+        <h2>📧 Digite seu e-mail</h2>
+        <input type="email" id="email" placeholder="seuemail@email.com">
+        <button onclick="sendCode()">Enviar código</button>
+        <p id="codeInfo"></p>
     </div>
 
-    <div class="card">
-        <h2>Jogos 2D</h2>
-        <p>
-            Jogos 2D usam apenas duas dimensões: largura e altura.
-            Exemplos: jogos de plataforma, fliperama e pixel art.
-        </p>
-        <p>
-            Eles são mais simples de criar e ótimos para iniciantes.
-        </p>
+    <!-- CODIGO -->
+    <div id="stepCode" class="hidden">
+        <h2>🔐 Digite o código</h2>
+        <input type="number" id="codeInput" placeholder="Código de 6 dígitos">
+        <button onclick="verifyCode()">Verificar</button>
     </div>
 
-    <div class="card">
-        <h2>Jogos 3D</h2>
-        <p>
-            Jogos 3D usam três dimensões: largura, altura e profundidade.
-            O jogador pode se mover em um mundo mais realista.
-        </p>
-        <p>
-            Exemplos: jogos de corrida, aventura e mundo aberto.
-        </p>
+    <!-- MENU -->
+    <div id="stepMenu" class="hidden">
+        <h2>Conta</h2>
+        <button onclick="showLogin()">Já sou cadastrado</button>
+        <button onclick="showRegister()">Registrar</button>
     </div>
 
-    <div class="card">
-        <h2>Como um jogo funciona?</h2>
-        <ul>
-            <li>🎮 Entrada do jogador (teclado, mouse, toque)</li>
-            <li>🧠 Lógica do jogo (regras, inimigos, pontuação)</li>
-            <li>🎨 Gráficos (2D ou 3D)</li>
-            <li>🔊 Sons e música</li>
-            <li>🔁 Atualização constante (frames)</li>
-        </ul>
+    <!-- LOGIN -->
+    <div id="stepLogin" class="hidden">
+        <h2>🔑 Login</h2>
+        <input id="loginUser" placeholder="Nome da conta">
+        <input type="password" id="loginPass" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
     </div>
 
-    <div class="card">
-        <h2>Ferramentas para criar jogos</h2>
-        <ul>
-            <li>Unity (2D e 3D)</li>
-            <li>PlayCanvas (jogos 3D no navegador)</li>
-            <li>GDevelop (sem programação)</li>
-            <li>Roblox Studio</li>
-        </ul>
+    <!-- REGISTRO -->
+    <div id="stepRegister" class="hidden">
+        <h2>📝 Registrar</h2>
+        <input id="regUser" placeholder="Nome da conta">
+        <input type="password" id="regPass" placeholder="Senha">
+        <button onclick="register()">Criar conta</button>
     </div>
 
-    <div class="card">
-        <h2>Dica final</h2>
-        <p>
-            Comece simples. Todo jogo grande começou pequeno.
-            Aprender aos poucos é o segredo para criar jogos incríveis.
-        </p>
+    <!-- SITE -->
+    <div id="site" class="hidden">
+        <h1>🎮 Bem-vindo ao site sobre jogos!</h1>
+        <p>Você entrou com sucesso.</p>
     </div>
 
-</section>
+</div>
 
-<footer>
-    <p>Site criado por você 🎉 | Aprendendo Game Dev</p>
-</footer>
+<script>
+let generatedCode = "";
+let userData = {};
+
+function sendCode() {
+    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById("codeInfo").innerText =
+        "Código enviado (simulado): " + generatedCode;
+    document.getElementById("stepEmail").classList.add("hidden");
+    document.getElementById("stepCode").classList.remove("hidden");
+}
+
+function verifyCode() {
+    const input = document.getElementById("codeInput").value;
+    if (input === generatedCode) {
+        document.getElementById("stepCode").classList.add("hidden");
+        document.getElementById("stepMenu").classList.remove("hidden");
+    } else {
+        alert("Código errado");
+    }
+}
+
+function showLogin() {
+    document.getElementById("stepMenu").classList.add("hidden");
+    document.getElementById("stepLogin").classList.remove("hidden");
+}
+
+function showRegister() {
+    document.getElementById("stepMenu").classList.add("hidden");
+    document.getElementById("stepRegister").classList.remove("hidden");
+}
+
+function register() {
+    const user = document.getElementById("regUser").value;
+    const pass = document.getElementById("regPass").value;
+    if (user && pass) {
+        userData[user] = pass;
+        enterSite();
+    }
+}
+
+function login() {
+    const user = document.getElementById("loginUser").value;
+    const pass = document.getElementById("loginPass").value;
+    if (userData[user] === pass) {
+        enterSite();
+    } else {
+        alert("Conta ou senha errada");
+    }
+}
+
+function enterSite() {
+    document.querySelectorAll(".container > div").forEach(d => d.classList.add("hidden"));
+    document.getElementById("site").classList.remove("hidden");
+}
+</script>
 
 </body>
-</html>}
+</html>
