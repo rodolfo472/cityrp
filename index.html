@@ -1,40 +1,97 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>CityRP Drift</title>
-<style>
-body { margin:0; overflow:hidden; background:black; }
-#ui {
-  position:fixed;
-  top:10px;
-  left:10px;
-  color:white;
-  font-family:Arial;
-  z-index:10;
-}
-button {
-  padding:6px;
-  margin:3px;
-  cursor:pointer;
-}
-#animMenu {
-  background:rgba(0,0,0,0.7);
-  padding:6px;
-  margin-top:5px;
-}
-</style>
-</head>
-<body>
+using UnityEngine;
 
-<div id="ui">
-  <button onclick="toggleAnimMenu()">🎭 Animações</button>
-  <div id="animMenu" style="display:none">
-    <button onclick="sit()">Sentar</button>
-    <button onclick="lie()">Deitar</button>
-    <button onclick="lean()">Encostar</button>
-    <button onclick="stand()">Normal</button>
-  </div>
+public class BearAI : MonoBehaviour
+{
+    [Header("Referência")]
+    public Transform player;
+
+    [Header("Distâncias")]
+    public float detectDistance = 10f;
+    public float attackDistance = 1.5f;
+
+    [Header("Movimento")]
+    public float moveSpeed = 4f;
+
+    [Header("Ataque")]
+    public float attackCooldown = 1.2f;
+
+    private float lastAttackTime;
+
+    void Update()
+    {
+        if (player == null) return;
+
+        float distance = Vector3.Distance(transform.position, player.position);
+
+        // Se o piloto entrar a 10m
+        if (distance <= detectDistance)
+        {
+            // Olhar para o piloto (3D)
+            Vector3 lookPos = player.position - transform.position;
+            lookPos.y = 0f;
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(lookPos),
+                Time.deltaTime * 5f
+            );
+
+            // Corre atrás
+            if (distance > attackDistance)
+            {
+                transform.position += transform.forward * moveSpeed * Time.deltaTime;
+            }
+            else
+            {
+                Attack();
+            }
+        }
+    }
+
+    void Attack()
+    {
+        if (Time.time - lastAttackTime >= attackCooldown)
+        {
+            lastAttackTime = Time.time;
+
+            PilotHealth health = player.GetComponent<PilotHealth>();
+            if (health != null)
+            {
+                health.TakeDamage(1);
+                Debug.Log("URSO DEU UM SOCO 🐻👊");
+            }
+        }
+    }
+}using UnityEngine;
+
+public class PilotHealth : MonoBehaviour
+{
+    public int maxHealth = 5;
+    private int currentHealth;
+
+    void Start()
+    {
+        currentHealth = maxHealth;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        Debug.Log("Piloto levou dano! Vida: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log("PILOTO MORREU ☠️");
+
+        // Desativa o piloto
+        gameObject.SetActive(false);
+    }
+}  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.155/build/three.min.js"></script>
