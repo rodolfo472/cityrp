@@ -12,61 +12,89 @@ body {
     color: #e5e7eb;
 }
 
-/* PLAYER BOX */
+/* ===== PLAYER BOX ===== */
 #playerBox {
     position: fixed;
     top: 10px;
     left: 10px;
-    width: 160px;
+    width: 170px;
     text-align: center;
     z-index: 1000;
 }
 
-#avatarWrap {
-    position: relative;
-    display: inline-block;
+/* ===== AVATAR ===== */
+#avatarWrapper {
+    width: 74px;
+    height: 74px;
+    padding: 4px;
+    border-radius: 6px;
+    background: #1e293b;
+    margin: auto;
 }
 
 #avatarImg {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid #38bdf8;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    border-radius: 4px;
 }
 
+/* ===== 🐍 BORDA ADM COBRA 3D NEON ===== */
+.adm-snake {
+    background:
+        linear-gradient(0deg,
+            #00ff66,
+            #00cc44,
+            #00ff66,
+            #00aa33);
+    background-size: 400% 400%;
+    animation: snakeMove 2.5s linear infinite;
+    box-shadow:
+        0 0 8px #00ff66,
+        0 0 16px #00ff66,
+        inset 0 0 10px #00aa33;
+}
+
+/* movimento em volta da borda */
+@keyframes snakeMove {
+    0%   { background-position: 0% 50%; }
+    25%  { background-position: 50% 100%; }
+    50%  { background-position: 100% 50%; }
+    75%  { background-position: 50% 0%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* botão trocar foto */
 #changeAvatarBtn {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: -6px;
+    right: -6px;
     width: 22px;
     height: 22px;
     border-radius: 50%;
     font-size: 12px;
-    padding: 0;
     cursor: pointer;
 }
 
+/* ===== INFO ===== */
 #playerName {
     font-size: 12px;
     font-weight: bold;
 }
-
 #playerCoins {
     font-size: 11px;
     color: #facc15;
 }
-
 #playerTime {
     font-size: 10px;
     color: #94a3b8;
 }
 
-/* CONTAINER */
+/* ===== CONTAINER ===== */
 .container {
     background: #020617;
     max-width: 420px;
-    margin: 180px auto;
+    margin: 200px auto;
     padding: 25px;
     border-radius: 10px;
     text-align: center;
@@ -88,18 +116,16 @@ button {
 
 .hidden { display: none; }
 
-/* BORDAS */
+/* ===== BORDAS ===== */
 #borderMenu {
     margin-top: 10px;
-    background: #020617;
     border: 1px solid #38bdf8;
-    border-radius: 10px;
     padding: 10px;
+    border-radius: 10px;
 }
 
 .borderItem {
     border: 1px solid #334155;
-    border-radius: 8px;
     padding: 8px;
     margin-bottom: 8px;
     cursor: pointer;
@@ -108,11 +134,11 @@ button {
 .borderPreview {
     width: 35px;
     height: 35px;
-    border-radius: 50%;
+    border-radius: 4px;
     margin: auto;
 }
 
-/* ALERTA */
+/* ===== ALERTA ===== */
 #alertMini {
     position: fixed;
     bottom: 20px;
@@ -133,7 +159,7 @@ button {
 
 <!-- PLAYER -->
 <div id="playerBox" class="hidden">
-    <div id="avatarWrap">
+    <div id="avatarWrapper">
         <img id="avatarImg">
         <button id="changeAvatarBtn" onclick="openAvatar()">📷</button>
     </div>
@@ -163,24 +189,17 @@ button {
 </div>
 
 <div id="site" class="hidden">
-    <h2>🎮 Bem-vindo</h2>
-
     <button onclick="toggleBorders()">🎨 Bordas</button>
 
     <div id="borderMenu" class="hidden">
         <div class="borderItem" onclick="buyBorder(100,'#38bdf8')">
             <div class="borderPreview" style="border:3px solid #38bdf8"></div>
-            Borda Azul<br>💰 100
+            Azul — 💰100
         </div>
 
         <div class="borderItem" onclick="buyBorder(500,'#a855f7')">
             <div class="borderPreview" style="border:3px solid #a855f7"></div>
-            Borda Roxa<br>💰 500
-        </div>
-
-        <div class="borderItem" onclick="buyBorder(1000,'gold')">
-            <div class="borderPreview" style="border:3px solid gold"></div>
-            Borda Lendária 🔥<br>💰 1000
+            Roxa — 💰500
         </div>
     </div>
 
@@ -240,10 +259,14 @@ function enterSite(user){
 
     show("site");
     playerBox.classList.remove("hidden");
+
     playerName.innerText = isADM ? "👑 Rodolfo (ADM)" : user;
 
     const av = localStorage.getItem("avatar_"+user);
     avatarImg.src = av || "https://i.imgur.com/6VBx3io.png";
+
+    const wrapper = document.getElementById("avatarWrapper");
+    wrapper.classList.toggle("adm-snake", isADM);
 
     if (isADM) {
         coins = Infinity;
@@ -296,7 +319,7 @@ function buyBorder(price,color){
         localStorage.setItem("coins_"+loggedUser, coins);
         playerCoins.innerText = "💰 " + coins;
     }
-    avatarImg.style.border = "3px solid " + color;
+    avatarWrapper.style.background = color;
 }
 
 /* PRÊMIO */
