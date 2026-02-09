@@ -3,9 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <title>City RP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: white;
+      text-align: center;
+    }
+
+    .screen {
+      display: none;
+      padding: 30px;
+    }
+
+    .active {
+      display: block;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn {
+      background: #ff9800;
+      color: black;
+      font-weight: bold;
+    }
+
+    .btn2 {
+      background: #2196f3;
+      color: white;
+    }
+
+    .card {
+      max-width: 400px;
+      margin: auto;
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
-<body style="background:#111;color:white;text-align:center;">
-  <h1>🏙️ City RP</h1>
-  <p>Meu site está online!</p>
+<body>
+
+<!-- TELA INICIAL -->
+<div id="menu" class="screen active">
+  <h1>🚗 City RP</h1>
+  <p>Jogo RP Online (Protótipo)</p>
+  <input id="nome" placeholder="Digite seu nome">
+  <br>
+  <button class="btn" onclick="entrar()">JOGAR</button>
+</div>
+
+<!-- JOGO -->
+<div id="game" class="screen">
+  <div class="card">
+    <h2 id="playerNome"></h2>
+    <p>💰 Dinheiro: R$ <span id="dinheiro">10000</span></p>
+    <p>📚 Estudos: <span id="estudos">0</span></p>
+    <p>👮 Profissão: <span id="job">Civil</span></p>
+
+    <button class="btn2" onclick="estudar()">📘 Estudar</button>
+    <button class="btn2" onclick="virarPolicia()">🚔 Virar Polícia</button>
+    <button class="btn2" onclick="inventario()">🎒 Inventário</button>
+  </div>
+</div>
+
+<script>
+  let dinheiro = 10000;
+  let estudos = 0;
+  let policial = false;
+
+  function entrar() {
+    const nome = document.getElementById("nome").value;
+    if (!nome) {
+      alert("Digite seu nome!");
+      return;
+    }
+    document.getElementById("menu").classList.remove("active");
+    document.getElementById("game").classList.add("active");
+    document.getElementById("playerNome").innerText = "👤 " + nome;
+  }
+
+  function estudar() {
+    estudos += 50;
+    document.getElementById("estudos").innerText = estudos;
+    alert("Você estudou e ganhou 50 estudos!");
+  }
+
+  function virarPolicia() {
+    if (policial) {
+      alert("Você já é policial!");
+      return;
+    }
+    if (estudos < 150) {
+      alert("Você precisa de 150 estudos para ser policial!");
+      return;
+    }
+    policial = true;
+    document.getElementById("job").innerText = "Policial";
+    alert("Parabéns! Agora você é policial 👮");
+  }
+
+  function inventario() {
+    alert("Inventário (em desenvolvimento)");
+  }
+</script>
+
 </body>
 </html>
