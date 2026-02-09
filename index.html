@@ -1,46 +1,27 @@
-Skip to content
-rodolfo472
-cityrp
-Repository navigation
-Code
-Issues
-Pull requests
-Actions
-Comparing changes
-Choose two branches to see what’s changed or to start a new pull request. If you need to, you can also  or learn more about diff comparisons.
-...
- 1 commit
- 1 file changed
- 1 contributor
-Commits on Feb 9, 2026
-Update index.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Sistema Gamer</title>
 
-@rodolfo472
-rodolfo472 authored 7 minutes ago
- Showing  with 56 additions and 33 deletions.
-  89 changes: 56 additions & 33 deletions89  
-index.html
-Original file line number	Diff line number	Diff line change
-@@ -12,61 +12,89 @@
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
     color: #e5e7eb;
 }
 
-/* PLAYER BOX */
-/* ===== PLAYER BOX ===== */
+/* PLAYER */
 #playerBox {
     position: fixed;
     top: 10px;
     left: 10px;
-    width: 160px;
-    width: 170px;
+    width: 180px;
     text-align: center;
     z-index: 1000;
 }
 
-#avatarWrap {
-    position: relative;
-    display: inline-block;
-/* ===== AVATAR ===== */
 #avatarWrapper {
     width: 74px;
     height: 74px;
@@ -48,27 +29,25 @@ Original file line number	Diff line number	Diff line change
     border-radius: 6px;
     background: #1e293b;
     margin: auto;
+    position: relative;
 }
 
 #avatarImg {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid #38bdf8;
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: 4px;
 }
 
-/* ===== 🐍 BORDA ADM COBRA 3D NEON ===== */
+/* 🐍 BORDA ADM COBRA NEON */
 .adm-snake {
-    background:
-        linear-gradient(0deg,
-            #00ff66,
-            #00cc44,
-            #00ff66,
-            #00aa33);
+    background: linear-gradient(
+        0deg,
+        #00ff66,
+        #00cc44,
+        #00ff66,
+        #00aa33
+    );
     background-size: 400% 400%;
     animation: snakeMove 2.5s linear infinite;
     box-shadow:
@@ -77,7 +56,6 @@ Original file line number	Diff line number	Diff line change
         inset 0 0 10px #00aa33;
 }
 
-/* movimento em volta da borda */
 @keyframes snakeMove {
     0%   { background-position: 0% 50%; }
     25%  { background-position: 50% 100%; }
@@ -86,119 +64,203 @@ Original file line number	Diff line number	Diff line change
     100% { background-position: 0% 50%; }
 }
 
-/* botão trocar foto */
+/* botão foto */
 #changeAvatarBtn {
     position: absolute;
-    bottom: 0;
-    right: 0;
     bottom: -6px;
     right: -6px;
     width: 22px;
     height: 22px;
     border-radius: 50%;
     font-size: 12px;
-    padding: 0;
     cursor: pointer;
 }
 
-/* ===== INFO ===== */
-#playerName {
-    font-size: 12px;
-    font-weight: bold;
-}
-
-#playerCoins {
-    font-size: 11px;
-    color: #facc15;
-}
-
-#playerTime {
-    font-size: 10px;
-    color: #94a3b8;
-}
+/* INFO */
+#playerName { font-size: 12px; font-weight: bold; }
+#playerCoins { font-size: 11px; color: #facc15; }
+#playerTime { font-size: 10px; color: #94a3b8; }
 
 /* CONTAINER */
-/* ===== CONTAINER ===== */
 .container {
     background: #020617;
     max-width: 420px;
-    margin: 180px auto;
-    margin: 200px auto;
+    margin: 220px auto;
     padding: 25px;
     border-radius: 10px;
     text-align: center;
-@@ -88,18 +116,16 @@
+}
+
+button, input {
+    width: 90%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    background: #38bdf8;
+    font-weight: bold;
+    cursor: pointer;
+}
 
 .hidden { display: none; }
 
-/* BORDAS */
-/* ===== BORDAS ===== */
-#borderMenu {
-    margin-top: 10px;
-    background: #020617;
-    border: 1px solid #38bdf8;
-    border-radius: 10px;
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.borderItem {
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-@@ -108,11 +134,11 @@
-.borderPreview {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border-radius: 4px;
-    margin: auto;
-}
-
-/* ALERTA */
-/* ===== ALERTA ===== */
-#alertMini {
+/* ADM */
+#adminBtn {
     position: fixed;
-    bottom: 20px;
-@@ -133,7 +159,7 @@
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: gold;
+    color: black;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 22px;
+    display: none;
+    z-index: 1000;
+}
+
+#adminPanel {
+    position: fixed;
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #020617;
+    border: 2px solid gold;
+    border-radius: 10px;
+    padding: 15px;
+    width: 200px;
+    display: none;
+    z-index: 1000;
+}
+</style>
+</head>
+
+<body>
 
 <!-- PLAYER -->
 <div id="playerBox" class="hidden">
-    <div id="avatarWrap">
     <div id="avatarWrapper">
         <img id="avatarImg">
         <button id="changeAvatarBtn" onclick="openAvatar()">📷</button>
     </div>
-@@ -163,24 +189,17 @@
+    <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="saveAvatar()">
+    <div id="playerName"></div>
+    <div id="playerCoins"></div>
+    <div id="playerTime"></div>
+</div>
+
+<!-- ADM -->
+<button id="adminBtn" onclick="toggleAdmin()">👑</button>
+
+<div id="adminPanel">
+    <h4>👑 Painel ADM</h4>
+    <input id="giveUser" placeholder="Jogador">
+    <input id="giveCoins" type="number" placeholder="Moedas">
+    <button onclick="giveMoney()">Dar dinheiro</button>
+</div>
+
+<div class="container">
+
+<div id="menu">
+    <button onclick="showLogin()">Login</button>
+    <button onclick="showRegister()">Registrar</button>
+</div>
+
+<div id="loginBox" class="hidden">
+    <input id="loginUser" placeholder="Usuário">
+    <input type="password" id="loginPass" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+</div>
+
+<div id="registerBox" class="hidden">
+    <input id="regUser" placeholder="Usuário">
+    <input type="password" id="regPass" placeholder="Senha">
+    <button onclick="register()">Criar conta</button>
 </div>
 
 <div id="site" class="hidden">
     <h2>🎮 Bem-vindo</h2>
+    <button onclick="logout()">Sair</button>
+</div>
 
-    <button onclick="toggleBorders()">🎨 Bordas</button>
+</div>
 
-    <div id="borderMenu" class="hidden">
-        <div class="borderItem" onclick="buyBorder(100,'#38bdf8')">
-            <div class="borderPreview" style="border:3px solid #38bdf8"></div>
-            Borda Azul<br>💰 100
-            Azul — 💰100
-        </div>
+<script>
+const ADMIN_USER = "Rodolfo";
+const ADMIN_PASS = "rodolfo408*";
 
-        <div class="borderItem" onclick="buyBorder(500,'#a855f7')">
-            <div class="borderPreview" style="border:3px solid #a855f7"></div>
-            Borda Roxa<br>💰 500
-        </div>
+let users = JSON.parse(localStorage.getItem("users")) || {};
+let loggedUser = localStorage.getItem("loggedUser");
+let isADM = false;
+let coins = 0, timer, startTime;
+let attempts = {};
 
-        <div class="borderItem" onclick="buyBorder(1000,'gold')">
-            <div class="borderPreview" style="border:3px solid gold"></div>
-            Borda Lendária 🔥<br>💰 1000
-            Roxa — 💰500
-        </div>
-    </div>
+/* INIT */
+if (loggedUser) {
+    enterSite(loggedUser);
+} else {
+    show("menu");
+}
 
-@@ -240,11 +259,15 @@ <h2>🎮 Bem-vindo</h2>
+/* TELAS */
+function show(id){
+    ["menu","loginBox","registerBox","site"].forEach(e=>{
+        document.getElementById(e).classList.add("hidden");
+    });
+    document.getElementById(id).classList.remove("hidden");
+}
+
+function showLogin(){ show("loginBox"); }
+function showRegister(){ show("registerBox"); }
+
+/* REGISTRO */
+function register(){
+    const u = regUser.value.trim();
+    const p = regPass.value.trim();
+
+    if (!u || !p) return alert("Preencha tudo");
+
+    if (users[u]) return alert("Nome já existe");
+
+    for (let k in users) {
+        if (users[k] === p) return alert("Senha já existe");
+    }
+
+    users[u] = p;
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("loggedUser", u);
+    localStorage.setItem("isADM", "0");
+    enterSite(u);
+}
+
+/* LOGIN */
+function login(){
+    const u = loginUser.value;
+    const p = loginPass.value;
+
+    attempts[u] = attempts[u] || 0;
+    if (attempts[u] >= 3) return alert("Conta bloqueada");
+
+    if (users[u] === p || (u === ADMIN_USER && p === ADMIN_PASS)) {
+        isADM = (u === ADMIN_USER && p === ADMIN_PASS);
+        localStorage.setItem("loggedUser", u);
+        localStorage.setItem("isADM", isADM ? "1" : "0");
+        attempts[u] = 0;
+        enterSite(u);
+    } else {
+        attempts[u]++;
+        alert("Senha errada (" + attempts[u] + "/3)");
+    }
+}
+
+/* SITE */
+function enterSite(user){
+    loggedUser = user;
+    isADM = localStorage.getItem("isADM") === "1";
 
     show("site");
     playerBox.classList.remove("hidden");
@@ -208,31 +270,65 @@ Original file line number	Diff line number	Diff line change
     const av = localStorage.getItem("avatar_"+user);
     avatarImg.src = av || "https://i.imgur.com/6VBx3io.png";
 
-    const wrapper = document.getElementById("avatarWrapper");
-    wrapper.classList.toggle("adm-snake", isADM);
+    avatarWrapper.classList.toggle("adm-snake", isADM);
 
     if (isADM) {
         coins = Infinity;
         playerCoins.innerText = "💰 ∞";
-@@ -296,7 +319,7 @@ <h2>🎮 Bem-vindo</h2>
-        localStorage.setItem("coins_"+loggedUser, coins);
+        adminBtn.style.display = "block";
+    } else {
+        coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
         playerCoins.innerText = "💰 " + coins;
+        adminBtn.style.display = "none";
     }
-    avatarImg.style.border = "3px solid " + color;
-    avatarWrapper.style.background = color;
+
+    clearInterval(timer);
+    startTime = Date.now();
+    timer = setInterval(()=>{
+        let s = Math.floor((Date.now()-startTime)/1000);
+        playerTime.innerText = "⏱️ " + s + "s";
+
+        if (!isADM) {
+            coins++;
+            localStorage.setItem("coins_"+user, coins);
+            playerCoins.innerText = "💰 " + coins;
+        }
+    },1000);
 }
 
-/* PRÊMIO */
-Footer
-© 2026 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Community
-Docs
-Contact
-Manage cookies
-Do not share my personal information
-    
+/* ADM */
+function toggleAdmin(){
+    adminPanel.style.display =
+        adminPanel.style.display === "block" ? "none" : "block";
+}
+
+function giveMoney(){
+    const u = giveUser.value;
+    const v = parseInt(giveCoins.value);
+    if (!u || isNaN(v)) return;
+    const current = parseInt(localStorage.getItem("coins_"+u)) || 0;
+    localStorage.setItem("coins_"+u, current + v);
+    alert("💰 Dinheiro enviado!");
+}
+
+/* AVATAR */
+function openAvatar(){ avatarInput.click(); }
+function saveAvatar(){
+    const r = new FileReader();
+    r.onload = () => {
+        avatarImg.src = r.result;
+        localStorage.setItem("avatar_"+loggedUser, r.result);
+    };
+    r.readAsDataURL(avatarInput.files[0]);
+}
+
+/* LOGOUT */
+function logout(){
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("isADM");
+    location.reload();
+}
+</script>
+
+</body>
+ </html>
