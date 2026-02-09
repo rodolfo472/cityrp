@@ -12,22 +12,40 @@ body {
     color: #e5e7eb;
 }
 
-/* PLAYER */
+/* PLAYER BOX */
 #playerBox {
     position: fixed;
     top: 10px;
     left: 10px;
-    width: 130px;
+    width: 150px;
     text-align: center;
     z-index: 1000;
 }
 
+#avatarWrap {
+    position: relative;
+    display: inline-block;
+}
+
 #avatarImg {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: 3px solid #38bdf8;
     object-fit: cover;
+}
+
+#changeAvatarBtn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #38bdf8;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    padding: 0;
+    cursor: pointer;
 }
 
 #playerName {
@@ -49,7 +67,7 @@ body {
 .container {
     background: #020617;
     max-width: 420px;
-    margin: 150px auto;
+    margin: 160px auto;
     padding: 25px;
     border-radius: 10px;
     text-align: center;
@@ -71,33 +89,55 @@ button {
 
 .hidden { display: none; }
 
-.smallWarn {
-    font-size: 10px;
-    color: #f87171;
-}
-
 /* ADM */
-#adminPanel {
-    background: #020617;
-    border: 1px solid gold;
-    border-radius: 8px;
-    padding: 10px;
-    margin-top: 10px;
-    font-size: 12px;
+#adminBtn {
+    position: fixed;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: gold;
+    color: #000;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+    display: none;
+    z-index: 1000;
 }
 
-/* ALERTA */
-#alertMini {
+#adminPanel {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%);
     background: #020617;
-    border: 1px solid #f87171;
-    color: #f87171;
-    font-size: 11px;
-    padding: 6px 10px;
-    border-radius: 6px;
+    border: 2px solid gold;
+    border-radius: 10px;
+    padding: 15px;
+    width: 200px;
+    display: none;
+    z-index: 1000;
+}
+
+/* RANKING */
+#rankBtn {
+    position: fixed;
+    right: 15px;
+    bottom: 20px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+}
+
+#rankingBox {
+    position: fixed;
+    right: 70px;
+    bottom: 20px;
+    background: #020617;
+    border: 1px solid #38bdf8;
+    padding: 10px;
+    border-radius: 10px;
+    width: 200px;
     display: none;
 }
 </style>
@@ -105,50 +145,59 @@ button {
 
 <body>
 
+<!-- PLAYER -->
 <div id="playerBox" class="hidden">
-    <img id="avatarImg">
+    <div id="avatarWrap">
+        <img id="avatarImg">
+        <button id="changeAvatarBtn" onclick="openAvatar()">📷</button>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="saveAvatar()">
     <div id="playerName"></div>
     <div id="playerCoins"></div>
     <div id="playerTime"></div>
 </div>
 
-<div class="container">
-
-    <div id="menu">
-        <button onclick="showLogin()">Login</button>
-        <button onclick="showRegister()">Registrar</button>
-    </div>
-
-    <div id="loginBox" class="hidden">
-        <input id="loginUser" placeholder="Usuário">
-        <input type="password" id="loginPass" placeholder="Senha">
-        <button onclick="login()">Entrar</button>
-        <button onclick="goMenu()">Voltar</button>
-    </div>
-
-    <div id="registerBox" class="hidden">
-        <input id="regUser" placeholder="Usuário">
-        <input type="password" id="regPass" placeholder="Senha">
-        <div id="passWarn" class="smallWarn"></div>
-        <button onclick="register()">Criar conta</button>
-        <button onclick="goMenu()">Voltar</button>
-    </div>
-
-    <div id="site" class="hidden">
-        <button onclick="logout()">Sair</button>
-
-        <!-- PAINEL ADM -->
-        <div id="adminPanel" class="hidden">
-            <h4>👑 ADM ∞</h4>
-            <input id="giveUser" placeholder="Nome do jogador">
-            <input id="giveCoins" type="number" placeholder="Quantidade">
-            <button onclick="giveMoney()">Dar dinheiro</button>
-        </div>
-    </div>
-
+<!-- ADM -->
+<button id="adminBtn" onclick="toggleAdmin()">👑</button>
+<div id="adminPanel">
+    <h4>ADM</h4>
+    <input id="giveUser" placeholder="Usuário">
+    <input id="giveCoins" type="number" placeholder="Moedas">
+    <button onclick="giveMoney()">Enviar</button>
 </div>
 
-<div id="alertMini">Ação não permitida ❌</div>
+<!-- RANKING -->
+<button id="rankBtn" onclick="toggleRanking()">🏆</button>
+<div id="rankingBox">
+    <h4>Ranking</h4>
+    <ul id="rankingList"></ul>
+</div>
+
+<div class="container">
+
+<div id="menu">
+    <button onclick="showLogin()">Login</button>
+    <button onclick="showRegister()">Registrar</button>
+</div>
+
+<div id="loginBox" class="hidden">
+    <input id="loginUser" placeholder="Usuário">
+    <input type="password" id="loginPass" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+</div>
+
+<div id="registerBox" class="hidden">
+    <input id="regUser" placeholder="Usuário">
+    <input type="password" id="regPass" placeholder="Senha">
+    <button onclick="register()">Criar conta</button>
+</div>
+
+<div id="site" class="hidden">
+    <h2>🎮 Bem-vindo</h2>
+    <button onclick="logout()">Sair</button>
+</div>
+
+</div>
 
 <script>
 const ADMIN_USER = "Rodolfo";
@@ -156,122 +205,112 @@ const ADMIN_PASS = "rodolfo408*";
 
 let users = JSON.parse(localStorage.getItem("users")) || {};
 let loggedUser = localStorage.getItem("loggedUser");
-let coins = 0;
-let timer, startTime;
+let coins = 0, timer, startTime;
 
 window.onload = () => {
     if (loggedUser) enterSite(loggedUser);
-    else showOnly("menu");
 };
 
-function showOnly(id){
+function show(id){
     ["menu","loginBox","registerBox","site"].forEach(e=>{
         document.getElementById(e).classList.add("hidden");
     });
     document.getElementById(id).classList.remove("hidden");
 }
 
-function showLogin(){ showOnly("loginBox"); }
-function showRegister(){ showOnly("registerBox"); }
-function goMenu(){ showOnly("menu"); }
+function showLogin(){ show("loginBox"); }
+function showRegister(){ show("registerBox"); }
 
-/* REGISTRO */
 function register(){
     const u = regUser.value.trim();
     const p = regPass.value.trim();
-    passWarn.innerText = "";
-
-    if (!u || !p) return;
-
-    if (users[u]) {
-        passWarn.innerText = "Nome já existe";
-        return;
-    }
-
-    if (Object.values(users).includes(p)) {
-        passWarn.innerText = "Senha já existe";
-        return;
-    }
-
+    if (!u || !p || users[u]) return;
     users[u] = p;
     localStorage.setItem("users", JSON.stringify(users));
     localStorage.setItem("loggedUser", u);
     enterSite(u);
 }
 
-/* LOGIN */
 function login(){
     const u = loginUser.value;
     const p = loginPass.value;
-
     if (users[u] === p || (u===ADMIN_USER && p===ADMIN_PASS)) {
         localStorage.setItem("loggedUser", u);
         enterSite(u);
-    } else {
-        showAlert();
     }
 }
 
-/* SITE */
 function enterSite(user){
     loggedUser = user;
-    showOnly("site");
+    show("site");
 
     playerBox.classList.remove("hidden");
-    playerName.innerText = user === ADMIN_USER ? "👑 Rodolfo (ADM ∞)" : user;
+    playerName.innerText = user === ADMIN_USER ? "👑 Rodolfo (ADM)" : user;
 
-    if (user === ADMIN_USER) {
+    const av = localStorage.getItem("avatar_"+user);
+    avatarImg.src = av || "https://i.imgur.com/6VBx3io.png";
+
+    if (user === ADMIN_USER){
         coins = Infinity;
         playerCoins.innerText = "💰 ∞";
-        adminPanel.classList.remove("hidden");
+        adminBtn.style.display = "block";
     } else {
         coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
         playerCoins.innerText = "💰 " + coins;
-        adminPanel.classList.add("hidden");
     }
 
-    startTimers();
-}
-
-/* TEMPO + MOEDAS */
-function startTimers(){
-    clearInterval(timer);
     startTime = Date.now();
-
     timer = setInterval(()=>{
         let s = Math.floor((Date.now()-startTime)/1000);
-        playerTime.innerText = `⏱️ ${s}s`;
-
-        if (loggedUser !== ADMIN_USER) {
+        playerTime.innerText = "⏱️ "+s+"s";
+        if (user !== ADMIN_USER){
             coins++;
-            localStorage.setItem("coins_"+loggedUser, coins);
+            localStorage.setItem("coins_"+user, coins);
             playerCoins.innerText = "💰 " + coins;
         }
     },1000);
 }
 
-/* ADM DAR DINHEIRO */
-function giveMoney(){
-    const u = giveUser.value;
-    const v = parseInt(giveCoins.value);
-
-    if (!u || isNaN(v)) return;
-
-    const current = parseInt(localStorage.getItem("coins_"+u)) || 0;
-    localStorage.setItem("coins_"+u, current + v);
-    alert("💰 Dinheiro enviado!");
-}
-
-/* LOGOUT */
 function logout(){
     localStorage.removeItem("loggedUser");
     location.reload();
 }
 
-/* ALERTA */
-function showAlert(){
-    alertMini.style.display="block";
-    setTimeout(()=>alertMini.style.display="none",2000);
+function openAvatar(){ avatarInput.click(); }
+function saveAvatar(){
+    const file = avatarInput.files[0];
+    const r = new FileReader();
+    r.onload = () => {
+        avatarImg.src = r.result;
+        localStorage.setItem("avatar_"+loggedUser, r.result);
+    };
+    r.readAsDataURL(file);
+}
+
+function toggleAdmin(){
+    adminPanel.style.display =
+        adminPanel.style.display === "block" ? "none" : "block";
+}
+
+function giveMoney(){
+    const u = giveUser.value;
+    const v = parseInt(giveCoins.value);
+    const c = parseInt(localStorage.getItem("coins_"+u)) || 0;
+    localStorage.setItem("coins_"+u, c+v);
+}
+
+function toggleRanking(){
+    rankingBox.style.display =
+        rankingBox.style.display === "block" ? "none" : "block";
+    rankingList.innerHTML = "";
+    for (let k in localStorage){
+        if (k.startsWith("coins_")){
+            const u = k.replace("coins_","");
+            const li = document.createElement("li");
+            li.innerText = u+" — 💰 "+localStorage.getItem(k);
+            rankingList.appendChild(li);
+        }
+    }
 }
 </script>
 
