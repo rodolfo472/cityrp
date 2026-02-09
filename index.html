@@ -12,7 +12,7 @@ body {
     color: #e5e7eb;
 }
 
-/* PLAYER BOX */
+/* PLAYER */
 #playerBox {
     position: fixed;
     top: 10px;
@@ -22,10 +22,7 @@ body {
     z-index: 1000;
 }
 
-#avatarWrap {
-    position: relative;
-    display: inline-block;
-}
+#avatarWrap { position: relative; display: inline-block; }
 
 #avatarImg {
     width: 60px;
@@ -39,41 +36,28 @@ body {
     position: absolute;
     bottom: 0;
     right: 0;
-    background: #38bdf8;
-    border-radius: 50%;
     width: 22px;
     height: 22px;
+    border-radius: 50%;
     font-size: 12px;
     padding: 0;
-    cursor: pointer;
 }
 
-#playerName {
-    font-size: 12px;
-    font-weight: bold;
-}
-
-#playerCoins {
-    font-size: 11px;
-    color: #facc15;
-}
-
-#playerTime {
-    font-size: 10px;
-    color: #94a3b8;
-}
+#playerName { font-size: 12px; font-weight: bold; }
+#playerCoins { font-size: 11px; color: #facc15; }
+#playerTime { font-size: 10px; color: #94a3b8; }
 
 /* CONTAINER */
 .container {
     background: #020617;
     max-width: 420px;
-    margin: 160px auto;
+    margin: 170px auto;
     padding: 25px;
     border-radius: 10px;
     text-align: center;
 }
 
-input, button {
+button, input {
     width: 90%;
     padding: 10px;
     margin: 6px 0;
@@ -89,55 +73,42 @@ button {
 
 .hidden { display: none; }
 
-/* ADM */
-#adminBtn {
-    position: fixed;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: gold;
-    color: #000;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 22px;
-    display: none;
-    z-index: 1000;
-}
-
-#adminPanel {
-    position: fixed;
-    right: 80px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #020617;
-    border: 2px solid gold;
-    border-radius: 10px;
-    padding: 15px;
-    width: 200px;
-    display: none;
-    z-index: 1000;
-}
-
-/* RANKING */
-#rankBtn {
-    position: fixed;
-    right: 15px;
-    bottom: 20px;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-}
-
-#rankingBox {
-    position: fixed;
-    right: 70px;
-    bottom: 20px;
+/* BORDAS */
+#borderMenu {
+    margin-top: 10px;
     background: #020617;
     border: 1px solid #38bdf8;
-    padding: 10px;
     border-radius: 10px;
-    width: 200px;
+    padding: 10px;
+}
+
+.borderItem {
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.borderPreview {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin: auto;
+}
+
+/* ALERTA */
+#alertMini {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #020617;
+    border: 1px solid #f87171;
+    color: #f87171;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 6px;
     display: none;
 }
 </style>
@@ -155,22 +126,6 @@ button {
     <div id="playerName"></div>
     <div id="playerCoins"></div>
     <div id="playerTime"></div>
-</div>
-
-<!-- ADM -->
-<button id="adminBtn" onclick="toggleAdmin()">👑</button>
-<div id="adminPanel">
-    <h4>ADM</h4>
-    <input id="giveUser" placeholder="Usuário">
-    <input id="giveCoins" type="number" placeholder="Moedas">
-    <button onclick="giveMoney()">Enviar</button>
-</div>
-
-<!-- RANKING -->
-<button id="rankBtn" onclick="toggleRanking()">🏆</button>
-<div id="rankingBox">
-    <h4>Ranking</h4>
-    <ul id="rankingList"></ul>
 </div>
 
 <div class="container">
@@ -194,22 +149,40 @@ button {
 
 <div id="site" class="hidden">
     <h2>🎮 Bem-vindo</h2>
+
+    <button onclick="toggleBorders()">🎨 Bordas</button>
+
+    <div id="borderMenu" class="hidden">
+        <div class="borderItem" onclick="buyBorder(100,'#38bdf8')">
+            <div class="borderPreview" style="border:3px solid #38bdf8"></div>
+            Azul<br>💰 100
+        </div>
+
+        <div class="borderItem" onclick="buyBorder(500,'#a855f7')">
+            <div class="borderPreview" style="border:3px solid #a855f7"></div>
+            Roxa<br>💰 500
+        </div>
+
+        <div class="borderItem" onclick="buyBorder(1000,'gold')">
+            <div class="borderPreview" style="border:3px solid gold"></div>
+            Lendária 🔥<br>💰 1000
+        </div>
+    </div>
+
+    <button onclick="buyPrize()">🏆 Comprar prêmio (5000)</button>
     <button onclick="logout()">Sair</button>
 </div>
 
 </div>
 
-<script>
-const ADMIN_USER = "Rodolfo";
-const ADMIN_PASS = "rodolfo408*";
+<div id="alertMini">Você não tem moedas suficientes 💸</div>
 
+<script>
 let users = JSON.parse(localStorage.getItem("users")) || {};
 let loggedUser = localStorage.getItem("loggedUser");
 let coins = 0, timer, startTime;
 
-window.onload = () => {
-    if (loggedUser) enterSite(loggedUser);
-};
+if (loggedUser) enterSite(loggedUser);
 
 function show(id){
     ["menu","loginBox","registerBox","site"].forEach(e=>{
@@ -222,21 +195,17 @@ function showLogin(){ show("loginBox"); }
 function showRegister(){ show("registerBox"); }
 
 function register(){
-    const u = regUser.value.trim();
-    const p = regPass.value.trim();
-    if (!u || !p || users[u]) return;
-    users[u] = p;
+    if (users[regUser.value]) return;
+    users[regUser.value] = regPass.value;
     localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("loggedUser", u);
-    enterSite(u);
+    localStorage.setItem("loggedUser", regUser.value);
+    enterSite(regUser.value);
 }
 
 function login(){
-    const u = loginUser.value;
-    const p = loginPass.value;
-    if (users[u] === p || (u===ADMIN_USER && p===ADMIN_PASS)) {
-        localStorage.setItem("loggedUser", u);
-        enterSite(u);
+    if (users[loginUser.value] === loginPass.value) {
+        localStorage.setItem("loggedUser", loginUser.value);
+        enterSite(loginUser.value);
     }
 }
 
@@ -245,29 +214,22 @@ function enterSite(user){
     show("site");
 
     playerBox.classList.remove("hidden");
-    playerName.innerText = user === ADMIN_USER ? "👑 Rodolfo (ADM)" : user;
+    playerName.innerText = user;
 
     const av = localStorage.getItem("avatar_"+user);
     avatarImg.src = av || "https://i.imgur.com/6VBx3io.png";
 
-    if (user === ADMIN_USER){
-        coins = Infinity;
-        playerCoins.innerText = "💰 ∞";
-        adminBtn.style.display = "block";
-    } else {
-        coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
-        playerCoins.innerText = "💰 " + coins;
-    }
+    coins = parseInt(localStorage.getItem("coins_"+user)) || 0;
+    playerCoins.innerText = "💰 " + coins;
 
     startTime = Date.now();
+    clearInterval(timer);
     timer = setInterval(()=>{
+        coins++;
+        localStorage.setItem("coins_"+user, coins);
+        playerCoins.innerText = "💰 " + coins;
         let s = Math.floor((Date.now()-startTime)/1000);
-        playerTime.innerText = "⏱️ "+s+"s";
-        if (user !== ADMIN_USER){
-            coins++;
-            localStorage.setItem("coins_"+user, coins);
-            playerCoins.innerText = "💰 " + coins;
-        }
+        playerTime.innerText = "⏱️ " + s + "s";
     },1000);
 }
 
@@ -276,43 +238,44 @@ function logout(){
     location.reload();
 }
 
+/* AVATAR */
 function openAvatar(){ avatarInput.click(); }
 function saveAvatar(){
-    const file = avatarInput.files[0];
     const r = new FileReader();
     r.onload = () => {
         avatarImg.src = r.result;
         localStorage.setItem("avatar_"+loggedUser, r.result);
     };
-    r.readAsDataURL(file);
+    r.readAsDataURL(avatarInput.files[0]);
 }
 
-function toggleAdmin(){
-    adminPanel.style.display =
-        adminPanel.style.display === "block" ? "none" : "block";
+/* BORDAS */
+function toggleBorders(){
+    borderMenu.classList.toggle("hidden");
 }
 
-function giveMoney(){
-    const u = giveUser.value;
-    const v = parseInt(giveCoins.value);
-    const c = parseInt(localStorage.getItem("coins_"+u)) || 0;
-    localStorage.setItem("coins_"+u, c+v);
+function buyBorder(price,color){
+    if (coins < price) return showAlert();
+    coins -= price;
+    avatarImg.style.border = "3px solid " + color;
+    localStorage.setItem("coins_"+loggedUser, coins);
+    playerCoins.innerText = "💰 " + coins;
 }
 
-function toggleRanking(){
-    rankingBox.style.display =
-        rankingBox.style.display === "block" ? "none" : "block";
-    rankingList.innerHTML = "";
-    for (let k in localStorage){
-        if (k.startsWith("coins_")){
-            const u = k.replace("coins_","");
-            const li = document.createElement("li");
-            li.innerText = u+" — 💰 "+localStorage.getItem(k);
-            rankingList.appendChild(li);
-        }
-    }
+/* PRÊMIO */
+function buyPrize(){
+    if (coins < 5000) return showAlert();
+    coins -= 5000;
+    localStorage.setItem("coins_"+loggedUser, coins);
+    alert("🎉 Prêmio comprado com sucesso!");
+}
+
+/* ALERTA */
+function showAlert(){
+    alertMini.style.display="block";
+    setTimeout(()=>alertMini.style.display="none",2000);
 }
 </script>
 
 </body>
-</html>
+    </html>
