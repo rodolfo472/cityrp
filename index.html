@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sistema Gamer</title>
+<title>Sistema Gamer Completo</title>
 
 <style>
 body{
@@ -11,58 +11,58 @@ body{
   background:#0b1020;
   color:#fff;
 }
-.screen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+.screen{display:none;min-height:100vh;align-items:center;justify-content:center}
+.active{display:flex}
+
 .box{
   background:#06172f;
   padding:20px;
-  width:380px;
+  width:400px;
   border-radius:12px;
   text-align:center;
 }
+
+.menu{
+  display:flex;
+  gap:5px;
+  margin-bottom:10px;
+}
+.menu button{
+  flex:1;
+  padding:6px;
+  background:#142d6b;
+}
+
+.section{display:none}
+.section.active{display:block}
+
 .avatar{
-  width:100px;
-  height:100px;
+  width:100px;height:100px;
   border-radius:50%;
   background:#444;
   margin:10px auto;
   border:6px solid transparent;
 }
 
-/* BORDAS */
 .borders,.inventory{
   display:flex;
   gap:10px;
   justify-content:center;
-  margin-top:10px;
+  flex-wrap:wrap;
 }
+
 .border{
-  width:55px;
-  height:55px;
+  width:50px;height:50px;
   border-radius:50%;
-  cursor:pointer;
   border:5px solid;
-  transition:transform .2s;
+  cursor:pointer;
 }
-.border:hover{transform:scale(1.1)}
 
 .gold{border-color:gold}
 .blue{border-color:#00aaff}
 .red{border-color:#ff4444}
 
-/* ADM */
-.admin-panel{
-  margin-top:15px;
-  background:#020a18;
-  padding:10px;
-  border-radius:8px;
-}
-
-button,input{
+input,button{
   width:100%;
   padding:8px;
   margin-top:6px;
@@ -74,16 +74,40 @@ button{
   color:#fff;
   cursor:pointer;
 }
+
+.admin-panel{
+  background:#020a18;
+  padding:10px;
+  border-radius:8px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="screen">
+<!-- LOGIN -->
+<div class="screen active" id="loginScreen">
+  <div class="box">
+    <h2>Login</h2>
+    <input id="loginName" placeholder="Nome">
+    <input id="loginPass" type="password" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+  </div>
+</div>
+
+<!-- JOGO -->
+<div class="screen" id="gameScreen">
   <div class="box">
 
+    <div class="menu">
+      <button onclick="openSection('profile')">Perfil</button>
+      <button onclick="openSection('shop')">Loja</button>
+      <button onclick="openSection('inventory')">Inventário</button>
+      <button onclick="openSection('ranking')">Ranking</button>
+    </div>
+
     <!-- PERFIL -->
-    <div class="profile">
+    <div class="section active" id="profile">
       <div class="avatar" id="avatar"></div>
       <h3 id="playerName"></h3>
       <p>💰 Moedas: <span id="coins"></span></p>
@@ -91,19 +115,30 @@ button{
     </div>
 
     <!-- LOJA -->
-    <h3>Comprar Bordas</h3>
-    <div class="borders">
-      <div class="border gold" onclick="buyBorder('gold',200)"></div>
-      <div class="border blue" onclick="buyBorder('#00aaff',150)"></div>
-      <div class="border red" onclick="buyBorder('#ff4444',100)"></div>
+    <div class="section" id="shop">
+      <h3>Comprar Bordas</h3>
+      <div class="borders">
+        <div class="border gold" onclick="buyBorder('gold',200)"></div>
+        <div class="border blue" onclick="buyBorder('#00aaff',150)"></div>
+        <div class="border red" onclick="buyBorder('#ff4444',100)"></div>
+      </div>
     </div>
 
     <!-- INVENTÁRIO -->
-    <h3>Inventário</h3>
-    <div class="inventory" id="inventory"></div>
+    <div class="section" id="inventory">
+      <h3>Inventário de Bordas</h3>
+      <div class="inventory" id="inventoryList"></div>
+    </div>
 
-    <!-- PAINEL ADM -->
-    <div class="admin-panel" id="adminPanel" style="display:none">
+    <!-- RANKING -->
+    <div class="section" id="ranking">
+      <h3>🏆 Ranking</h3>
+      <p>1º Rodolfo – 9999 moedas</p>
+      <p>2º Player – 500 moedas</p>
+    </div>
+
+    <!-- ADM -->
+    <div class="admin-panel section" id="adminPanel">
       <h3>Painel ADM</h3>
       <input id="admName" placeholder="Nome do jogador">
       <button onclick="giveAdmin()">Dar ADM</button>
@@ -117,110 +152,94 @@ button{
 </audio>
 
 <script>
-// =====================
-// DADOS
-// =====================
-let players = ["Player1","Joao","Maria"];
-let admins = ["Player1"];
+// USUÁRIOS DE EXEMPLO
+const users = [
+  {name:"Rodolfo", pass:"rodolfo408*", admin:true}
+];
+
+let admins = ["Rodolfo"];
 
 let player = {
-  name: "Player1",
-  coins: 500,
-  equippedBorder: null,
-  inventory: []
+  name:"",
+  coins:500,
+  equipped:null,
+  inventory:[]
 };
 
-// =====================
-// INICIAR
-// =====================
-playerName.innerText = player.name;
-coins.innerText = player.coins;
+// LOGIN
+function login(){
+  let n = loginName.value;
+  let p = loginPass.value;
 
-if (/Android|iPhone|iPad/i.test(navigator.userAgent)){
-  device.innerText = "📱 Mobile";
-}else{
-  device.innerText = "💻 PC";
-}
+  let user = users.find(u=>u.name===n && u.pass===p);
+  if(!user){ alert("Login inválido"); return; }
 
-if (admins.includes(player.name)){
-  adminPanel.style.display = "block";
-}
-
-// =====================
-// COMPRAR BORDA
-// =====================
-function buyBorder(color, price){
-  if(player.coins < price){
-    alert("Moedas insuficientes!");
-    return;
-  }
-
-  // Se não tem borda equipada
-  if(player.equippedBorder === null){
-    player.equippedBorder = color;
-    avatar.style.borderColor = color;
-  }else{
-    // Já tem → vai pro inventário
-    if(!player.inventory.includes(color)){
-      player.inventory.push(color);
-    }
-  }
-
-  player.coins -= price;
+  player.name = n;
+  playerName.innerText = n;
   coins.innerText = player.coins;
-  buySound.play();
-  renderInventory();
-}
 
-// =====================
-// EQUIPAR BORDA DO INVENTÁRIO
-// =====================
-function equipBorder(color){
-  // borda atual vai para inventário
-  if(player.equippedBorder !== null){
-    player.inventory.push(player.equippedBorder);
+  if(admins.includes(n)){
+    adminPanel.classList.add("active");
   }
 
-  // remove a nova do inventário
-  player.inventory = player.inventory.filter(b => b !== color);
+  if(/Android|iPhone/i.test(navigator.userAgent)){
+    device.innerText="📱 Mobile";
+  }else{
+    device.innerText="💻 PC";
+  }
 
-  // equipa
-  player.equippedBorder = color;
-  avatar.style.borderColor = color;
+  loginScreen.classList.remove("active");
+  gameScreen.classList.add("active");
+}
 
+// MENU
+function openSection(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(id==="inventory") renderInventory();
+}
+
+// BORDAS
+function buyBorder(color,price){
+  if(player.coins<price){alert("Moedas insuficientes");return;}
+  player.coins-=price;
+  coins.innerText=player.coins;
+
+  if(player.equipped===null){
+    player.equipped=color;
+    avatar.style.borderColor=color;
+  }else{
+    player.inventory.push(color);
+  }
+  buySound.play();
+}
+
+function equipBorder(color){
+  player.inventory = player.inventory.filter(b=>b!==color);
+  if(player.equipped) player.inventory.push(player.equipped);
+  player.equipped=color;
+  avatar.style.borderColor=color;
   renderInventory();
 }
 
-// =====================
-// MOSTRAR INVENTÁRIO
-// =====================
 function renderInventory(){
-  inventory.innerHTML = "";
-  player.inventory.forEach(color=>{
-    let div = document.createElement("div");
-    div.className = "border";
-    div.style.borderColor = color;
-    div.onclick = ()=>equipBorder(color);
-    inventory.appendChild(div);
+  inventoryList.innerHTML="";
+  player.inventory.forEach(c=>{
+    let d=document.createElement("div");
+    d.className="border";
+    d.style.borderColor=c;
+    d.onclick=()=>equipBorder(c);
+    inventoryList.appendChild(d);
   });
 }
 
-// =====================
-// DAR ADM
-// =====================
+// ADM
 function giveAdmin(){
-  let name = admName.value.trim();
-  if(!players.includes(name)){
-    alert("Jogador não encontrado");
-    return;
-  }
-  if(admins.includes(name)){
-    alert("Já é ADM");
-    return;
-  }
+  let name=admName.value.trim();
+  if(!name){alert("Digite um nome");return;}
+  if(admins.includes(name)){alert("Já é ADM");return;}
   admins.push(name);
-  alert(name + " agora é ADM!");
-  admName.value="";
+  alert(name+" agora é ADM!");
 }
 </script>
 
