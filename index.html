@@ -5,104 +5,28 @@
 <title>Sistema Gamer Completo</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0b1020;
-  color:#fff;
-}
+body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
 .screen{display:none;min-height:100vh;align-items:center;justify-content:center}
 .active{display:flex}
-
-.box{
-  background:#06172f;
-  width:440px;
-  padding:15px;
-  border-radius:12px;
-  text-align:center;
-}
-
-.menu{
-  display:flex;
-  gap:5px;
-  margin-bottom:10px;
-}
+.box{background:#06172f;width:460px;padding:15px;border-radius:12px;text-align:center}
+.menu{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
 .menu button{flex:1}
-
 .section{display:none}
 .section.active{display:block}
-
-/* PERFIL */
-.avatar{
-  width:100px;height:100px;
-  border-radius:50%;
-  background:#444;
-  margin:10px auto;
-  border:6px solid transparent;
-  overflow:hidden;
-}
+.avatar{width:100px;height:100px;border-radius:50%;background:#444;margin:10px auto;border:6px solid transparent;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover}
-
-/* BORDAS */
-.border{
-  width:50px;height:50px;
-  border-radius:50%;
-  border:5px solid;
-  cursor:pointer;
-}
+.border{width:50px;height:50px;border-radius:50%;border:5px solid;cursor:pointer}
 .gold{border-color:gold}
 .blue{border-color:#00aaff}
 .red{border-color:#ff4444}
 .admin{border-color:gold;box-shadow:0 0 10px gold}
 .premium{border-color:#ff00ff;box-shadow:0 0 10px #ff00ff}
-
-.borders,.inventory{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-
-input,button{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  border:none;
-  border-radius:5px;
-}
+.borders,.inventory{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+input,button{width:100%;padding:8px;margin-top:6px;border:none;border-radius:5px}
 button{background:#1c4cff;color:#fff}
-
-/* ADM */
-#admMenuBtn{
-  position:fixed;
-  right:10px;
-  top:50%;
-  transform:translateY(-50%);
-  background:#ff4444;
-  padding:10px;
-  border-radius:8px;
-  display:none;
-  cursor:pointer;
-}
-#admMenuPanel{
-  position:fixed;
-  right:70px;
-  top:50%;
-  transform:translateY(-50%);
-  background:#020a18;
-  padding:15px;
-  width:260px;
-  border-radius:10px;
-  display:none;
-}
-
-/* RANKING */
-.rank-item{
-  background:#020a18;
-  padding:8px;
-  margin:6px 0;
-  border-radius:6px;
-}
+#admBtn{position:fixed;right:10px;top:50%;transform:translateY(-50%);background:#ff4444;padding:12px;border-radius:10px;display:none;cursor:pointer}
+#admPanel{position:fixed;right:80px;top:50%;transform:translateY(-50%);background:#020a18;padding:15px;width:260px;border-radius:12px;display:none}
+.rank{background:#020a18;padding:8px;margin:6px 0;border-radius:6px}
 </style>
 </head>
 
@@ -115,6 +39,18 @@ button{background:#1c4cff;color:#fff}
     <input id="loginName" placeholder="Nome">
     <input id="loginPass" type="password" placeholder="Senha">
     <button onclick="login()">Entrar</button>
+    <button onclick="openRegister()">Registrar</button>
+  </div>
+</div>
+
+<!-- REGISTRO -->
+<div class="screen" id="registerScreen">
+  <div class="box">
+    <h2>Registro</h2>
+    <input id="regName" placeholder="Nome">
+    <input id="regPass" type="password" placeholder="Senha">
+    <button onclick="register()">Criar conta</button>
+    <button onclick="backLogin()">Voltar</button>
   </div>
 </div>
 
@@ -131,7 +67,6 @@ button{background:#1c4cff;color:#fff}
       <button onclick="openSec('ranking')">Ranking</button>
     </div>
 
-    <!-- PERFIL -->
     <div class="section active" id="perfil">
       <div class="avatar" id="avatar"></div>
       <h3 id="nome"></h3>
@@ -139,118 +74,110 @@ button{background:#1c4cff;color:#fff}
       <p id="status"></p>
     </div>
 
-    <!-- LOJA -->
     <div class="section" id="loja">
       <h3>Bordas</h3>
       <div class="borders">
-        <div class="border gold" onclick="buyBorder('gold',200)"></div>
-        <div class="border blue" onclick="buyBorder('#00aaff',150)"></div>
-        <div class="border red" onclick="buyBorder('#ff4444',100)"></div>
+        <div class="border gold" onclick="buyBorder('gold')"></div>
+        <div class="border blue" onclick="buyBorder('#00aaff')"></div>
+        <div class="border red" onclick="buyBorder('#ff4444')"></div>
       </div>
     </div>
 
-    <!-- INVENTÁRIO -->
     <div class="section" id="inventario">
       <h3>Inventário</h3>
       <div class="inventory" id="inv"></div>
     </div>
 
-    <!-- PREMIUM -->
     <div class="section" id="premium">
       <h3>💎 Premium</h3>
-      <p>Dinheiro infinito + borda exclusiva</p>
       <button onclick="buyPremium()">Comprar Premium</button>
     </div>
 
-    <!-- FOTO -->
     <div class="section" id="foto">
-      <h3>Foto de Perfil</h3>
       <input type="file" accept="image/*" onchange="setPhoto(event)">
     </div>
 
-    <!-- RANKING -->
     <div class="section" id="ranking">
-      <h3>🏆 Ranking Global</h3>
-      <div id="rankingList"></div>
+      <h3>🏆 Ranking</h3>
+      <div id="rankList"></div>
     </div>
 
   </div>
 </div>
 
-<!-- ADM -->
-<div id="admMenuBtn" onclick="toggleAdm()">ADM MENU</div>
+<div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
 
-<div id="admMenuPanel">
-  <h3>👑 ADM</h3>
+<div id="admPanel">
+  <h3>ADM</h3>
+  <button onclick="giveMoney()">Dar dinheiro</button>
   <button onclick="givePremium()">Dar Premium</button>
 </div>
 
 <script>
-// ================= BANCO LOCAL =================
-let playersDB = JSON.parse(localStorage.getItem("playersDB")||"[]");
-
-let users=[{name:"Rodolfo",pass:"rodolfo408*",admin:true}];
+let users=JSON.parse(localStorage.getItem("users")||"[]");
+let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
 let user=null;
 
-// AUTO LOGIN
-let saved=localStorage.getItem("user");
-if(saved){
-  user=JSON.parse(saved);
-  start();
+const ADM_NAME="Rodolfo";
+const ADM_PASS="rodolfo408*";
+
+// jogadores aleatórios
+if(playersDB.length===0){
+  ["João","Maria","Carlos","Ana","Lucas"].forEach(n=>{
+    playersDB.push({name:n,coins:Math.floor(Math.random()*5000)+100,admin:false,premium:false});
+  });
+  localStorage.setItem("playersDB",JSON.stringify(playersDB));
 }
 
-// LOGIN
+// auto login
+let saved=localStorage.getItem("user");
+if(saved){user=JSON.parse(saved);start();}
+
+function openRegister(){loginScreen.classList.remove("active");registerScreen.classList.add("active")}
+function backLogin(){registerScreen.classList.remove("active");loginScreen.classList.add("active")}
+
+function register(){
+  users.push({name:regName.value,pass:regPass.value});
+  localStorage.setItem("users",JSON.stringify(users));
+  alert("Conta criada!");
+  backLogin();
+}
+
 function login(){
-  let u=users.find(x=>x.name===loginName.value && x.pass===loginPass.value);
+  let u=users.find(x=>x.name===loginName.value&&x.pass===loginPass.value)
+    || (loginName.value===ADM_NAME&&loginPass.value===ADM_PASS?{name:ADM_NAME,admin:true}:null);
   if(!u){alert("Login inválido");return;}
 
-  user={
-    name:u.name,
-    admin:u.admin,
-    premium:false,
-    coins:999999,
-    inventory:u.admin?["ADMIN"]:[],
-    equipped:null,
-    photo:null
-  };
-
+  user={name:u.name,coins:999999,inventory:u.name===ADM_NAME?["ADMIN"]:[],equipped:null,premium:false,admin:u.name===ADM_NAME};
   saveUser();
   start();
 }
 
-// START
 function start(){
   loginScreen.classList.remove("active");
+  registerScreen.classList.remove("active");
   gameScreen.classList.add("active");
   nome.innerText=user.name;
-  coins.innerText=user.premium||user.admin?"∞":user.coins;
+  coins.innerText=user.admin||user.premium?"∞":user.coins;
   status.innerText=user.admin?"👑 ADM":user.premium?"💎 Premium":"Jogador";
-
-  if(user.photo){
-    avatar.innerHTML=`<img src="${user.photo}">`;
-  }
-
-  if(user.admin) admMenuBtn.style.display="block";
+  if(user.admin) admBtn.style.display="block";
   updateDB();
 }
 
-// MENU
 function openSec(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(id==="inventario") renderInv();
-  if(id==="ranking") renderRanking();
+  if(id==="ranking") renderRank();
 }
 
-// BORDAS
-function buyBorder(color){
-  if(!user.equipped) user.equipped=color;
-  else user.inventory.push(color);
-  avatar.style.borderColor=color;
+function buyBorder(c){
+  if(!user.equipped) user.equipped=c;
+  else user.inventory.push(c);
+  avatar.style.borderColor=c;
   saveUser();
 }
 
-// INVENTÁRIO
 function renderInv(){
   inv.innerHTML="";
   user.inventory.forEach(b=>{
@@ -272,38 +199,25 @@ function equip(b){
   saveUser();
 }
 
-// PREMIUM
 function buyPremium(){
   user.premium=true;
-  if(!user.inventory.includes("PREMIUM")) user.inventory.push("PREMIUM");
-  coins.innerText="∞";
-  status.innerText="💎 Premium";
+  user.inventory.push("PREMIUM");
   saveUser();
 }
 
-// FOTO
 function setPhoto(e){
   let r=new FileReader();
-  r.onload=()=>{
-    user.photo=r.result;
-    avatar.innerHTML=`<img src="${r.result}">`;
-    saveUser();
-  };
+  r.onload=()=>{avatar.innerHTML=`<img src="${r.result}">`;user.photo=r.result;saveUser()}
   r.readAsDataURL(e.target.files[0]);
 }
 
-// ADM
 function toggleAdm(){
-  admMenuPanel.style.display=admMenuPanel.style.display==="block"?"none":"block";
-}
-function givePremium(){
-  user.premium=true;
-  if(!user.inventory.includes("PREMIUM")) user.inventory.push("PREMIUM");
-  saveUser();
-  alert("Premium dado");
+  admPanel.style.display=admPanel.style.display==="block"?"none":"block";
 }
 
-// RANKING
+function giveMoney(){user.coins+=1000;saveUser()}
+function givePremium(){user.premium=true;saveUser()}
+
 function updateDB(){
   let i=playersDB.findIndex(p=>p.name===user.name);
   if(i>=0) playersDB[i]=user;
@@ -311,23 +225,13 @@ function updateDB(){
   localStorage.setItem("playersDB",JSON.stringify(playersDB));
 }
 
-function renderRanking(){
-  rankingList.innerHTML="";
-  let sorted=[...playersDB].sort((a,b)=>{
-    if(a.coins===Infinity) return -1;
-    if(b.coins===Infinity) return 1;
-    return b.coins-a.coins;
-  });
-
-  sorted.forEach((p,i)=>{
-    let d=document.createElement("div");
-    d.className="rank-item";
-    d.innerHTML=`${i+1}º ${p.name} - ${p.admin?"ADM":p.premium?"Premium":"Jogador"} - 💰 ${p.premium||p.admin?"∞":p.coins}`;
-    rankingList.appendChild(d);
+function renderRank(){
+  rankList.innerHTML="";
+  [...playersDB].sort((a,b)=>b.coins-a.coins).forEach((p,i)=>{
+    rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
   });
 }
 
-// SALVAR
 function saveUser(){
   localStorage.setItem("user",JSON.stringify(user));
   updateDB();
