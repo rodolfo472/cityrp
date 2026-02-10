@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sistema Gamer Completo</title>
+<title>Sistema Gamer</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
@@ -92,14 +92,21 @@ button{background:#1c4cff;color:#fff}
       <button onclick="openSec('apps')">🎮 Central de Jogos</button>
     </div>
 
+    <!-- PERFIL -->
     <div class="section active" id="perfil">
       <div class="avatar" id="avatar"></div>
       <h3 id="nome"></h3>
-      <p>💰 Dinheiro: <span id="coins"></span></p>
+      <p>💰 Dinheiro do site: <span id="coins"></span></p>
+
+      <!-- BOTÃO RESGATAR (ADICIONADO) -->
+      <button onclick="resgatarDinheiro()">💸 Resgatar</button>
+      <p id="resgateMsg"></p>
+
       <p id="status"></p>
       <p id="device"></p>
     </div>
 
+    <!-- LOJA -->
     <div class="section" id="loja">
       <h3>Bordas</h3>
       <div class="borders">
@@ -109,20 +116,23 @@ button{background:#1c4cff;color:#fff}
       </div>
     </div>
 
+    <!-- INVENTÁRIO -->
     <div class="section" id="inventario">
-      <h3>Inventário</h3>
       <div class="inventory" id="inv"></div>
     </div>
 
+    <!-- PREMIUM -->
     <div class="section" id="premium">
       <h3>💎 Premium</h3>
       <button onclick="buyPremium()">Ativar Premium</button>
     </div>
 
+    <!-- FOTO -->
     <div class="section" id="foto">
       <input type="file" accept="image/*" onchange="setPhoto(event)">
     </div>
 
+    <!-- RANKING -->
     <div class="section" id="ranking">
       <div id="rankList"></div>
     </div>
@@ -130,13 +140,16 @@ button{background:#1c4cff;color:#fff}
   </div>
 </div>
 
+<!-- ADM -->
 <div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
 
 <div id="admPanel">
   <h3>👑 PAINEL ADM</h3>
-  <input id="admMoneyName" placeholder="Jogador">
-  <input id="admMoneyValue" type="number" placeholder="Quantia">
-  <button onclick="admGiveMoney()">Dar dinheiro</button>
+
+  <h4>Gerar código de dinheiro</h4>
+  <input id="moneyValue" type="number" placeholder="Quantia">
+  <button onclick="generateMoneyCode()">Gerar Código</button>
+  <p id="moneyCode"></p>
 </div>
 
 <script>
@@ -145,12 +158,11 @@ const ADM_PASS="rodolfo408*";
 
 let user=null;
 let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
+let moneyCodes=JSON.parse(localStorage.getItem("moneyCodes")||"{}");
 
+// auto login
 let saved=localStorage.getItem("user");
-if(saved){
-  user=JSON.parse(saved);
-  start();
-}
+if(saved){user=JSON.parse(saved);start();}
 
 function detectDevice(){
   return /mobile/i.test(navigator.userAgent)?"📱 Mobile":"💻 PC";
@@ -158,40 +170,24 @@ function detectDevice(){
 
 /* LOGIN */
 function login(){
-  let n=loginName.value;
-  let p=loginPass.value;
-
-  if(n===ADM_NAME && p===ADM_PASS){
-    user={name:n,pass:p,coins:1000,admin:true,premium:false,inventory:[],photo:null,device:detectDevice()};
-    saveUser(); start(); return;
+  let n=loginName.value,p=loginPass.value;
+  if(n===ADM_NAME&&p===ADM_PASS){
+    user={name:n,coins:0,admin:true,premium:false,inventory:[],photo:null,device:detectDevice()};
+    saveUser();start();return;
   }
-
-  let u=playersDB.find(x=>x.name===n && x.pass===p);
+  let u=playersDB.find(x=>x.name===n&&x.pass===p);
   if(!u){alert("Login inválido");return;}
-  user=u;
-  saveUser();
-  start();
+  user=u;saveUser();start();
 }
 
 /* REGISTRO */
-function goRegister(){
-  loginScreen.classList.remove("active");
-  registerScreen.classList.add("active");
-}
-function backLogin(){
-  registerScreen.classList.remove("active");
-  loginScreen.classList.add("active");
-}
+function goRegister(){loginScreen.classList.remove("active");registerScreen.classList.add("active")}
+function backLogin(){registerScreen.classList.remove("active");loginScreen.classList.add("active")}
 function register(){
-  let n=regName.value.trim();
-  let p=regPass.value.trim();
-  if(!n||!p){alert("Preencha tudo");return;}
+  let n=regName.value,p=regPass.value;
   if(playersDB.find(x=>x.name===n)){alert("Nome já existe");return;}
-
-  user={name:n,pass:p,coins:1000,admin:false,premium:false,inventory:[],photo:null,device:detectDevice()};
-  playersDB.push(user);
-  saveUser();
-  start();
+  user={name:n,pass:p,coins:0,admin:false,premium:false,inventory:[],photo:null,device:detectDevice()};
+  playersDB.push(user);saveUser();start();
 }
 
 /* START */
@@ -206,12 +202,13 @@ function start(){
   device.innerText=user.device;
 
   if(user.photo) avatar.innerHTML=`<img src="${user.photo}">`;
+  if(user.equipped) avatar.style.borderColor=user.equipped;
   if(user.admin) admBtn.style.display="block";
 
   saveDB();
 }
 
-/* OUTROS SISTEMAS (inalterados) */
+/* MENU */
 function openSec(id){
   if(id==="apps"){window.location.href="painel.html";return;}
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -220,17 +217,78 @@ function openSec(id){
   if(id==="ranking") renderRank();
 }
 
+/* BORDAS */
 function buyBorder(c){if(!user.inventory.includes(c))user.inventory.push(c);equip(c)}
 function equip(c){user.equipped=c;avatar.style.borderColor=c;saveUser()}
-function renderInv(){inv.innerHTML="";user.inventory.forEach(b=>{let d=document.createElement("div");d.className="border";d.style.borderColor=b;d.onclick=()=>equip(b);inv.appendChild(d)})}
-function buyPremium(){user.premium=true;user.inventory.push("#ff00ff");equip("#ff00ff");saveUser()}
-function setPhoto(e){let r=new FileReader();r.onload=()=>{user.photo=r.result;avatar.innerHTML=`<img src="${r.result}">`;saveUser()};r.readAsDataURL(e.target.files[0])}
-function toggleAdm(){admPanel.style.display=admPanel.style.display==="block"?"none":"block"}
-function admGiveMoney(){let n=admMoneyName.value;let v=Number(admMoneyValue.value);let p=playersDB.find(x=>x.name===n);if(!p)return;p.coins+=v;saveDB()}
-function renderRank(){rankList.innerHTML="";playersDB.sort((a,b)=>b.coins-a.coins).forEach((p,i)=>rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`)}
+function renderInv(){
+  inv.innerHTML="";
+  user.inventory.forEach(b=>{
+    let d=document.createElement("div");
+    d.className="border";d.style.borderColor=b;
+    d.onclick=()=>equip(b);inv.appendChild(d);
+  });
+}
 
-function saveUser(){localStorage.setItem("user",JSON.stringify(user));saveDB()}
-function saveDB(){localStorage.setItem("playersDB",JSON.stringify(playersDB))}
+/* PREMIUM */
+function buyPremium(){
+  user.premium=true;
+  user.inventory.push("#ff00ff");
+  equip("#ff00ff");
+  saveUser();
+}
+
+/* FOTO */
+function setPhoto(e){
+  let r=new FileReader();
+  r.onload=()=>{user.photo=r.result;avatar.innerHTML=`<img src="${r.result}">`;saveUser()}
+  r.readAsDataURL(e.target.files[0]);
+}
+
+/* ADM CÓDIGO */
+function toggleAdm(){admPanel.style.display=admPanel.style.display==="block"?"none":"block"}
+function generateMoneyCode(){
+  if(!user.admin)return;
+  let v=parseInt(moneyValue.value);
+  let c="DIN-"+Math.random().toString(36).substr(2,6).toUpperCase();
+  moneyCodes[c]=v;
+  localStorage.setItem("moneyCodes",JSON.stringify(moneyCodes));
+  moneyCode.innerText="Código: "+c;
+}
+
+/* RESGATAR DINHEIRO (NOVO) */
+function resgatarDinheiro(){
+  let msg=document.getElementById("resgateMsg");
+  if(user.coins>0){
+    user.coins=0;
+    saveUser();
+    coins.innerText=user.coins;
+    msg.style.color="#55ff55";
+    msg.innerText="Robux foi resgatado para sua conta, chegará daqui a um ano.";
+  }else{
+    msg.style.color="#ff5555";
+    msg.innerText="Você não tem dinheiro suficiente.";
+  }
+}
+
+/* RANKING */
+function renderRank(){
+  rankList.innerHTML="";
+  playersDB.sort((a,b)=>b.coins-a.coins).forEach((p,i)=>{
+    rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
+  });
+}
+
+/* SAVE */
+function saveUser(){
+  localStorage.setItem("user",JSON.stringify(user));
+  saveDB();
+}
+function saveDB(){
+  let i=playersDB.findIndex(p=>p.name===user.name);
+  if(i>=0) playersDB[i]=user;
+  else playersDB.push(user);
+  localStorage.setItem("playersDB",JSON.stringify(playersDB));
+}
 </script>
 
 </body>
