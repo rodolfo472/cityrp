@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sistema Gamer</title>
+<title>Sistema Gamer Completo</title>
 
 <style>
 body{
   margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Arial;
   background:#0b1020;
   color:#fff;
 }
@@ -16,41 +16,35 @@ body{
 
 .box{
   background:#06172f;
-  padding:20px;
   width:420px;
+  padding:15px;
   border-radius:12px;
   text-align:center;
 }
 
-/* MENU */
 .menu{
   display:flex;
   gap:5px;
   margin-bottom:10px;
 }
-.menu button{flex:1;background:#142d6b}
+.menu button{flex:1}
 
-/* SEÇÕES */
 .section{display:none}
 .section.active{display:block}
 
-/* PERFIL */
 .avatar{
   width:100px;height:100px;
   border-radius:50%;
   background:#444;
   margin:10px auto;
   border:6px solid transparent;
-  box-shadow:0 0 15px transparent;
+  overflow:hidden;
+}
+.avatar img{
+  width:100%;height:100%;object-fit:cover;
 }
 
-/* BORDAS */
-.borders,.inventory{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
+/* Bordas */
 .border{
   width:50px;height:50px;
   border-radius:50%;
@@ -60,16 +54,16 @@ body{
 .gold{border-color:gold}
 .blue{border-color:#00aaff}
 .red{border-color:#ff4444}
-.adminBorder{
-  border-color:gold;
-  box-shadow:0 0 10px gold;
-}
-.premiumBorder{
-  border-color:#ff00ff;
-  box-shadow:0 0 10px #ff00ff;
+.admin{border-color:gold;box-shadow:0 0 10px gold}
+.premium{border-color:#ff00ff;box-shadow:0 0 10px #ff00ff}
+
+.borders,.inventory{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
 }
 
-/* INPUT */
 input,button{
   width:100%;
   padding:8px;
@@ -77,13 +71,10 @@ input,button{
   border:none;
   border-radius:5px;
 }
-button{
-  background:#1c4cff;
-  color:#fff;
-}
+button{background:#1c4cff;color:#fff}
 
-/* ADM MENU */
-#admButton{
+/* ADM */
+#admBtn{
   position:fixed;
   right:10px;
   top:50%;
@@ -91,8 +82,8 @@ button{
   background:#ff4444;
   padding:10px;
   border-radius:8px;
-  cursor:pointer;
   display:none;
+  cursor:pointer;
 }
 #admPanel{
   position:fixed;
@@ -125,21 +116,23 @@ button{
   <div class="box">
 
     <div class="menu">
-      <button onclick="openSection('profile')">Perfil</button>
-      <button onclick="openSection('shop')">Loja</button>
-      <button onclick="openSection('inventory')">Inventário</button>
+      <button onclick="openSec('perfil')">Perfil</button>
+      <button onclick="openSec('loja')">Loja</button>
+      <button onclick="openSec('inventario')">Inventário</button>
+      <button onclick="openSec('premium')">Premium</button>
+      <button onclick="openSec('config')">Foto</button>
     </div>
 
     <!-- PERFIL -->
-    <div class="section active" id="profile">
+    <div class="section active" id="perfil">
       <div class="avatar" id="avatar"></div>
-      <h3 id="playerName"></h3>
+      <h3 id="nome"></h3>
       <p>💰 Moedas: <span id="coins"></span></p>
       <p id="status"></p>
     </div>
 
     <!-- LOJA -->
-    <div class="section" id="shop">
+    <div class="section" id="loja">
       <h3>Bordas</h3>
       <div class="borders">
         <div class="border gold" onclick="buyBorder('gold',200)"></div>
@@ -149,139 +142,135 @@ button{
     </div>
 
     <!-- INVENTÁRIO -->
-    <div class="section" id="inventory">
+    <div class="section" id="inventario">
       <h3>Inventário</h3>
-      <div class="inventory" id="inventoryList"></div>
+      <div class="inventory" id="inv"></div>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="section" id="premium">
+      <h3>💎 Premium</h3>
+      <p>Dinheiro infinito + borda exclusiva</p>
+      <button onclick="buyPremium()">Comprar Premium</button>
+    </div>
+
+    <!-- FOTO -->
+    <div class="section" id="config">
+      <h3>Foto de Perfil</h3>
+      <input type="file" accept="image/*" onchange="setPhoto(event)">
     </div>
 
   </div>
 </div>
 
 <!-- ADM -->
-<div id="admButton" onclick="toggleAdmPanel()">ADM MENU</div>
-
+<div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
 <div id="admPanel">
-  <h3>Painel ADM</h3>
+  <h3>ADM</h3>
   <button onclick="givePremium()">Dar Premium</button>
 </div>
 
-<audio id="buySound">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3">
-</audio>
-
 <script>
-let users=[{name:"Rodolfo",pass:"rodolfo408*",admin:true,premium:true}];
-let currentUser=null;
+let users=[{name:"Rodolfo",pass:"rodolfo408*",admin:true}];
+let user=null;
 
 // AUTO LOGIN
-let saved=localStorage.getItem("user");
-if(saved){
-  currentUser=JSON.parse(saved);
-  startGame();
-}
+let save=localStorage.getItem("user");
+if(save){user=JSON.parse(save);start();}
 
 function login(){
-  let u=users.find(x=>x.name===loginName.value && x.pass===loginPass.value);
+  let u=users.find(x=>x.name===loginName.value&&x.pass===loginPass.value);
   if(!u){alert("Login inválido");return;}
-  currentUser={
+  user={
     name:u.name,
     admin:u.admin,
-    premium:u.premium,
+    premium:false,
     coins:999999,
     inventory:[],
-    equipped:null
+    equipped:null,
+    photo:null
   };
-
-  if(u.admin){
-    currentUser.inventory.push("ADMIN");
-  }
-  if(u.premium){
-    currentUser.inventory.push("PREMIUM");
-  }
-
-  save();
-  startGame();
+  if(u.admin) user.inventory.push("ADMIN");
+  localStorage.setItem("user",JSON.stringify(user));
+  start();
 }
 
-function startGame(){
+function start(){
   loginScreen.classList.remove("active");
   gameScreen.classList.add("active");
-  playerName.innerText=currentUser.name;
-  updateCoins();
-  updateStatus();
-  if(currentUser.admin) admButton.style.display="block";
+  nome.innerText=user.name;
+  coins.innerText=user.premium||user.admin?"∞":user.coins;
+  status.innerText=user.admin?"👑 ADM":user.premium?"💎 Premium":"Jogador";
+  if(user.admin) admBtn.style.display="block";
+  if(user.photo){
+    avatar.innerHTML=`<img src="${user.photo}">`;
+  }
 }
 
-function updateCoins(){
-  coins.innerText = "∞";
-}
-
-function updateStatus(){
-  status.innerText =
-    currentUser.admin ? "👑 ADM" :
-    currentUser.premium ? "💎 Premium" : "Jogador";
-}
-
-function openSection(id){
+function openSec(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  if(id==="inventory") renderInventory();
+  if(id==="inventario") renderInv();
 }
 
-function buyBorder(color,price){
-  if(!currentUser.admin && !currentUser.premium){
-    currentUser.coins-=price;
-  }
-  if(!currentUser.equipped){
-    currentUser.equipped=color;
+function buyBorder(color){
+  if(!user.equipped){
+    user.equipped=color;
   }else{
-    currentUser.inventory.push(color);
+    user.inventory.push(color);
   }
   avatar.style.borderColor=color;
-  buySound.play();
-  save();
+  saveUser();
 }
 
-function equipBorder(type){
-  if(type==="ADMIN"){
-    avatar.style.borderColor="gold";
-    avatar.style.boxShadow="0 0 20px gold";
-  }else if(type==="PREMIUM"){
-    avatar.style.borderColor="#ff00ff";
-    avatar.style.boxShadow="0 0 20px #ff00ff";
-  }else{
-    avatar.style.borderColor=type;
-    avatar.style.boxShadow="none";
-  }
-}
-
-function renderInventory(){
-  inventoryList.innerHTML="";
-  currentUser.inventory.forEach(b=>{
+function renderInv(){
+  inv.innerHTML="";
+  user.inventory.forEach(b=>{
     let d=document.createElement("div");
     d.className="border";
-    if(b==="ADMIN"){d.classList.add("adminBorder")}
-    else if(b==="PREMIUM"){d.classList.add("premiumBorder")}
+    if(b==="ADMIN") d.classList.add("admin");
+    else if(b==="PREMIUM") d.classList.add("premium");
     else d.style.borderColor=b;
-    d.onclick=()=>equipBorder(b);
-    inventoryList.appendChild(d);
+    d.onclick=()=>equip(b);
+    inv.appendChild(d);
   });
 }
 
-function toggleAdmPanel(){
+function equip(b){
+  if(user.equipped) user.inventory.push(user.equipped);
+  user.inventory=user.inventory.filter(x=>x!==b);
+  user.equipped=b;
+  avatar.style.borderColor=b==="ADMIN"?"gold":b==="PREMIUM"?"#ff00ff":b;
+  saveUser();
+}
+
+function buyPremium(){
+  user.premium=true;
+  user.inventory.push("PREMIUM");
+  coins.innerText="∞";
+  status.innerText="💎 Premium";
+  saveUser();
+}
+
+function setPhoto(e){
+  let r=new FileReader();
+  r.onload=()=>{user.photo=r.result;avatar.innerHTML=`<img src="${r.result}">`;saveUser();}
+  r.readAsDataURL(e.target.files[0]);
+}
+
+function toggleAdm(){
   admPanel.style.display=admPanel.style.display==="block"?"none":"block";
 }
 
 function givePremium(){
-  currentUser.premium=true;
-  currentUser.inventory.push("PREMIUM");
-  updateStatus();
-  save();
-  alert("Premium ativado");
+  user.premium=true;
+  if(!user.inventory.includes("PREMIUM")) user.inventory.push("PREMIUM");
+  saveUser();
+  alert("Premium dado");
 }
 
-function save(){
-  localStorage.setItem("user",JSON.stringify(currentUser));
+function saveUser(){
+  localStorage.setItem("user",JSON.stringify(user));
 }
 </script>
 
