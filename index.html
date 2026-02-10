@@ -8,7 +8,7 @@
 body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
 .screen{display:none;min-height:100vh;align-items:center;justify-content:center}
 .active{display:flex}
-.box{background:#06172f;width:460px;padding:15px;border-radius:12px;text-align:center}
+.box{background:#06172f;width:480px;padding:15px;border-radius:12px;text-align:center}
 
 .menu{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
 .menu button{flex:1}
@@ -28,6 +28,21 @@ body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
 
 .borders,.inventory{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
+.apps{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+.app{
+  background:#020a18;
+  padding:20px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+.app:hover{background:#1c4cff}
+
 input,button{width:100%;padding:8px;margin-top:6px;border:none;border-radius:5px}
 button{background:#1c4cff;color:#fff}
 
@@ -43,7 +58,6 @@ button{background:#1c4cff;color:#fff}
   cursor:pointer;
   z-index:1000;
 }
-
 #admPanel{
   position:fixed;
   right:80px;
@@ -96,6 +110,7 @@ button{background:#1c4cff;color:#fff}
       <button onclick="openSec('premium')">Premium</button>
       <button onclick="openSec('foto')">Foto</button>
       <button onclick="openSec('ranking')">Ranking</button>
+      <button onclick="openSec('apps')">🎮 Apps</button>
     </div>
 
     <div class="section active" id="perfil">
@@ -132,6 +147,16 @@ button{background:#1c4cff;color:#fff}
     <div class="section" id="ranking">
       <h3>🏆 Ranking</h3>
       <div id="rankList"></div>
+    </div>
+
+    <div class="section" id="apps">
+      <h3>🎮 Central de Jogos</h3>
+      <div class="apps">
+        <div class="app" onclick="openApp('https://www.minecraft.net')">🟩 Minecraft</div>
+        <div class="app" onclick="openApp('https://www.rockstargames.com/gta-v')">🚗 GTA</div>
+        <div class="app" onclick="openApp('https://www.roblox.com')">🟥 Roblox</div>
+        <div class="app" onclick="openApp('https://www.epicgames.com/fortnite')">🟪 Fortnite</div>
+      </div>
     </div>
 
   </div>
@@ -266,15 +291,8 @@ function toggleAdm(){
   admPanel.style.display=admPanel.style.display==="block"?"none":"block";
 }
 
-function giveMoney(){
-  user.coins+=1000;
-  saveUser();
-}
-
-function givePremium(){
-  user.premium=true;
-  saveUser();
-}
+function giveMoney(){user.coins+=1000;saveUser()}
+function givePremium(){user.premium=true;saveUser()}
 
 function updateDB(){
   let i=playersDB.findIndex(p=>p.name===user.name);
@@ -293,6 +311,10 @@ function renderRank(){
 function saveUser(){
   localStorage.setItem("user",JSON.stringify(user));
   updateDB();
+}
+
+function openApp(url){
+  window.open(url,"_blank");
 }
 </script>
 
