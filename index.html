@@ -9,23 +9,54 @@ body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
 .screen{display:none;min-height:100vh;align-items:center;justify-content:center}
 .active{display:flex}
 .box{background:#06172f;width:460px;padding:15px;border-radius:12px;text-align:center}
+
 .menu{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
 .menu button{flex:1}
+
 .section{display:none}
 .section.active{display:block}
+
 .avatar{width:100px;height:100px;border-radius:50%;background:#444;margin:10px auto;border:6px solid transparent;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover}
+
 .border{width:50px;height:50px;border-radius:50%;border:5px solid;cursor:pointer}
 .gold{border-color:gold}
 .blue{border-color:#00aaff}
 .red{border-color:#ff4444}
 .admin{border-color:gold;box-shadow:0 0 10px gold}
 .premium{border-color:#ff00ff;box-shadow:0 0 10px #ff00ff}
+
 .borders,.inventory{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
 input,button{width:100%;padding:8px;margin-top:6px;border:none;border-radius:5px}
 button{background:#1c4cff;color:#fff}
-#admBtn{position:fixed;right:10px;top:50%;transform:translateY(-50%);background:#ff4444;padding:12px;border-radius:10px;display:none;cursor:pointer}
-#admPanel{position:fixed;right:80px;top:50%;transform:translateY(-50%);background:#020a18;padding:15px;width:260px;border-radius:12px;display:none}
+
+#admBtn{
+  position:fixed;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  background:#ff4444;
+  padding:12px;
+  border-radius:10px;
+  display:none;
+  cursor:pointer;
+  z-index:1000;
+}
+
+#admPanel{
+  position:fixed;
+  right:80px;
+  top:50%;
+  transform:translateY(-50%);
+  background:#020a18;
+  padding:15px;
+  width:260px;
+  border-radius:12px;
+  display:none;
+  z-index:1000;
+}
+
 .rank{background:#020a18;padding:8px;margin:6px 0;border-radius:6px}
 </style>
 </head>
@@ -72,6 +103,7 @@ button{background:#1c4cff;color:#fff}
       <h3 id="nome"></h3>
       <p>💰 Dinheiro: <span id="coins"></span></p>
       <p id="status"></p>
+      <p id="device"></p>
     </div>
 
     <div class="section" id="loja">
@@ -108,23 +140,23 @@ button{background:#1c4cff;color:#fff}
 <div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
 
 <div id="admPanel">
-  <h3>ADM</h3>
+  <h3>👑 ADM</h3>
   <button onclick="giveMoney()">Dar dinheiro</button>
   <button onclick="givePremium()">Dar Premium</button>
 </div>
 
 <script>
+const ADM_NAME="Rodolfo";
+const ADM_PASS="rodolfo408*";
+
 let users=JSON.parse(localStorage.getItem("users")||"[]");
 let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
 let user=null;
 
-const ADM_NAME="Rodolfo";
-const ADM_PASS="rodolfo408*";
-
 // jogadores aleatórios
 if(playersDB.length===0){
   ["João","Maria","Carlos","Ana","Lucas"].forEach(n=>{
-    playersDB.push({name:n,coins:Math.floor(Math.random()*5000)+100,admin:false,premium:false});
+    playersDB.push({name:n,coins:Math.floor(Math.random()*5000)+500});
   });
   localStorage.setItem("playersDB",JSON.stringify(playersDB));
 }
@@ -133,22 +165,39 @@ if(playersDB.length===0){
 let saved=localStorage.getItem("user");
 if(saved){user=JSON.parse(saved);start();}
 
+function detectDevice(){
+  let ua=navigator.userAgent.toLowerCase();
+  if(ua.includes("android")||ua.includes("iphone")||ua.includes("ipad")) return "📱 Mobile";
+  return "💻 PC";
+}
+
 function openRegister(){loginScreen.classList.remove("active");registerScreen.classList.add("active")}
 function backLogin(){registerScreen.classList.remove("active");loginScreen.classList.add("active")}
 
 function register(){
   users.push({name:regName.value,pass:regPass.value});
   localStorage.setItem("users",JSON.stringify(users));
-  alert("Conta criada!");
+  alert("Conta criada");
   backLogin();
 }
 
 function login(){
-  let u=users.find(x=>x.name===loginName.value&&x.pass===loginPass.value)
-    || (loginName.value===ADM_NAME&&loginPass.value===ADM_PASS?{name:ADM_NAME,admin:true}:null);
+  let u=users.find(x=>x.name===loginName.value&&x.pass===loginPass.value);
+  if(loginName.value===ADM_NAME&&loginPass.value===ADM_PASS){
+    u={name:ADM_NAME,admin:true};
+  }
   if(!u){alert("Login inválido");return;}
 
-  user={name:u.name,coins:999999,inventory:u.name===ADM_NAME?["ADMIN"]:[],equipped:null,premium:false,admin:u.name===ADM_NAME};
+  user={
+    name:u.name,
+    coins:999999,
+    inventory:u.name===ADM_NAME?["ADMIN"]:[],
+    equipped:null,
+    premium:false,
+    admin:u.name===ADM_NAME,
+    photo:null,
+    device:detectDevice()
+  };
   saveUser();
   start();
 }
@@ -160,6 +209,8 @@ function start(){
   nome.innerText=user.name;
   coins.innerText=user.admin||user.premium?"∞":user.coins;
   status.innerText=user.admin?"👑 ADM":user.premium?"💎 Premium":"Jogador";
+  device.innerText=user.device;
+  if(user.photo) avatar.innerHTML=`<img src="${user.photo}">`;
   if(user.admin) admBtn.style.display="block";
   updateDB();
 }
@@ -215,8 +266,15 @@ function toggleAdm(){
   admPanel.style.display=admPanel.style.display==="block"?"none":"block";
 }
 
-function giveMoney(){user.coins+=1000;saveUser()}
-function givePremium(){user.premium=true;saveUser()}
+function giveMoney(){
+  user.coins+=1000;
+  saveUser();
+}
+
+function givePremium(){
+  user.premium=true;
+  saveUser();
+}
 
 function updateDB(){
   let i=playersDB.findIndex(p=>p.name===user.name);
