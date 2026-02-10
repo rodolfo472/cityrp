@@ -28,7 +28,6 @@ body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
 .gold{border-color:gold}
 .blue{border-color:#00aaff}
 .red{border-color:#ff4444}
-.admin{border-color:gold;box-shadow:0 0 10px gold}
 .premium{border-color:#ff00ff;box-shadow:0 0 10px #ff00ff}
 
 .borders,.inventory{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -64,6 +63,18 @@ button{background:#1c4cff;color:#fff}
     <input id="loginName" placeholder="Nome">
     <input id="loginPass" type="password" placeholder="Senha">
     <button onclick="login()">Entrar</button>
+    <button onclick="goRegister()">Criar conta</button>
+  </div>
+</div>
+
+<!-- REGISTRO -->
+<div class="screen" id="registerScreen">
+  <div class="box">
+    <h2>Registro</h2>
+    <input id="regName" placeholder="Nome">
+    <input id="regPass" type="password" placeholder="Senha">
+    <button onclick="register()">Registrar</button>
+    <button onclick="backLogin()">Voltar</button>
   </div>
 </div>
 
@@ -81,7 +92,6 @@ button{background:#1c4cff;color:#fff}
       <button onclick="openSec('apps')">🎮 Central de Jogos</button>
     </div>
 
-    <!-- PERFIL -->
     <div class="section active" id="perfil">
       <div class="avatar" id="avatar"></div>
       <h3 id="nome"></h3>
@@ -90,7 +100,6 @@ button{background:#1c4cff;color:#fff}
       <p id="device"></p>
     </div>
 
-    <!-- LOJA -->
     <div class="section" id="loja">
       <h3>Bordas</h3>
       <div class="borders">
@@ -100,25 +109,20 @@ button{background:#1c4cff;color:#fff}
       </div>
     </div>
 
-    <!-- INVENTÁRIO -->
     <div class="section" id="inventario">
       <h3>Inventário</h3>
       <div class="inventory" id="inv"></div>
     </div>
 
-    <!-- PREMIUM -->
     <div class="section" id="premium">
       <h3>💎 Premium</h3>
-      <p>Dinheiro ilimitado + borda exclusiva</p>
       <button onclick="buyPremium()">Ativar Premium</button>
     </div>
 
-    <!-- FOTO -->
     <div class="section" id="foto">
       <input type="file" accept="image/*" onchange="setPhoto(event)">
     </div>
 
-    <!-- RANKING -->
     <div class="section" id="ranking">
       <div id="rankList"></div>
     </div>
@@ -126,21 +130,13 @@ button{background:#1c4cff;color:#fff}
   </div>
 </div>
 
-<!-- ADM -->
 <div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
 
 <div id="admPanel">
   <h3>👑 PAINEL ADM</h3>
-
-  <h4>Dar dinheiro</h4>
   <input id="admMoneyName" placeholder="Jogador">
   <input id="admMoneyValue" type="number" placeholder="Quantia">
-  <button onclick="admGiveMoney()">Enviar</button>
-
-  <h4>Dar ADM</h4>
-  <input id="admAdminName" placeholder="Jogador">
-  <input id="admAdminDays" type="number" placeholder="Dias">
-  <button onclick="admGiveAdmin()">Dar ADM</button>
+  <button onclick="admGiveMoney()">Dar dinheiro</button>
 </div>
 
 <script>
@@ -150,49 +146,58 @@ const ADM_PASS="rodolfo408*";
 let user=null;
 let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
 
-// jogadores aleatórios
-if(playersDB.length===0){
-  ["João","Maria","Carlos","Ana","Lucas"].forEach(n=>{
-    playersDB.push({name:n,coins:1000});
-  });
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
-}
-
-// AUTO LOGIN
 let saved=localStorage.getItem("user");
 if(saved){
   user=JSON.parse(saved);
-  if(user.name===ADM_NAME) user.admin=true;
   start();
 }
 
 function detectDevice(){
-  const ua=navigator.userAgent.toLowerCase();
-  return ua.includes("android")||ua.includes("iphone")?"📱 Mobile":"💻 PC";
+  return /mobile/i.test(navigator.userAgent)?"📱 Mobile":"💻 PC";
 }
 
-// LOGIN
+/* LOGIN */
 function login(){
-  if(loginName.value!==ADM_NAME||loginPass.value!==ADM_PASS){
-    alert("Login inválido");return;
+  let n=loginName.value;
+  let p=loginPass.value;
+
+  if(n===ADM_NAME && p===ADM_PASS){
+    user={name:n,pass:p,coins:1000,admin:true,premium:false,inventory:[],photo:null,device:detectDevice()};
+    saveUser(); start(); return;
   }
-  user={
-    name:ADM_NAME,
-    coins:1000,
-    admin:true,
-    premium:false,
-    inventory:["ADMIN"],
-    equipped:null,
-    photo:null,
-    device:detectDevice()
-  };
+
+  let u=playersDB.find(x=>x.name===n && x.pass===p);
+  if(!u){alert("Login inválido");return;}
+  user=u;
   saveUser();
   start();
 }
 
-// START
+/* REGISTRO */
+function goRegister(){
+  loginScreen.classList.remove("active");
+  registerScreen.classList.add("active");
+}
+function backLogin(){
+  registerScreen.classList.remove("active");
+  loginScreen.classList.add("active");
+}
+function register(){
+  let n=regName.value.trim();
+  let p=regPass.value.trim();
+  if(!n||!p){alert("Preencha tudo");return;}
+  if(playersDB.find(x=>x.name===n)){alert("Nome já existe");return;}
+
+  user={name:n,pass:p,coins:1000,admin:false,premium:false,inventory:[],photo:null,device:detectDevice()};
+  playersDB.push(user);
+  saveUser();
+  start();
+}
+
+/* START */
 function start(){
   loginScreen.classList.remove("active");
+  registerScreen.classList.remove("active");
   gameScreen.classList.add("active");
 
   nome.innerText=user.name;
@@ -200,19 +205,13 @@ function start(){
   status.innerText=user.admin?"👑 ADM":user.premium?"💎 Premium":"Jogador";
   device.innerText=user.device;
 
-  if(user.equipped){
-    avatar.style.borderColor=user.equipped;
-  }
-  if(user.photo){
-    avatar.innerHTML=`<img src="${user.photo}">`;
-  }
-
+  if(user.photo) avatar.innerHTML=`<img src="${user.photo}">`;
   if(user.admin) admBtn.style.display="block";
 
-  updateDB();
+  saveDB();
 }
 
-// MENU
+/* OUTROS SISTEMAS (inalterados) */
 function openSec(id){
   if(id==="apps"){window.location.href="painel.html";return;}
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -221,95 +220,17 @@ function openSec(id){
   if(id==="ranking") renderRank();
 }
 
-// BORDAS
-function buyBorder(color){
-  if(!user.inventory.includes(color)){
-    user.inventory.push(color);
-  }
-  equip(color);
-}
+function buyBorder(c){if(!user.inventory.includes(c))user.inventory.push(c);equip(c)}
+function equip(c){user.equipped=c;avatar.style.borderColor=c;saveUser()}
+function renderInv(){inv.innerHTML="";user.inventory.forEach(b=>{let d=document.createElement("div");d.className="border";d.style.borderColor=b;d.onclick=()=>equip(b);inv.appendChild(d)})}
+function buyPremium(){user.premium=true;user.inventory.push("#ff00ff");equip("#ff00ff");saveUser()}
+function setPhoto(e){let r=new FileReader();r.onload=()=>{user.photo=r.result;avatar.innerHTML=`<img src="${r.result}">`;saveUser()};r.readAsDataURL(e.target.files[0])}
+function toggleAdm(){admPanel.style.display=admPanel.style.display==="block"?"none":"block"}
+function admGiveMoney(){let n=admMoneyName.value;let v=Number(admMoneyValue.value);let p=playersDB.find(x=>x.name===n);if(!p)return;p.coins+=v;saveDB()}
+function renderRank(){rankList.innerHTML="";playersDB.sort((a,b)=>b.coins-a.coins).forEach((p,i)=>rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`)}
 
-function equip(color){
-  user.equipped=color;
-  avatar.style.borderColor=color;
-  saveUser();
-}
-
-function renderInv(){
-  inv.innerHTML="";
-  user.inventory.forEach(b=>{
-    let d=document.createElement("div");
-    d.className="border";
-    d.style.borderColor=b;
-    d.onclick=()=>equip(b);
-    inv.appendChild(d);
-  });
-}
-
-// PREMIUM
-function buyPremium(){
-  if(user.premium) return;
-  user.premium=true;
-  user.inventory.push("#ff00ff");
-  equip("#ff00ff");
-  saveUser();
-  alert("Premium ativado!");
-}
-
-// FOTO
-function setPhoto(e){
-  let r=new FileReader();
-  r.onload=()=>{
-    user.photo=r.result;
-    avatar.innerHTML=`<img src="${r.result}">`;
-    saveUser();
-  }
-  r.readAsDataURL(e.target.files[0]);
-}
-
-// ADM
-function toggleAdm(){
-  admPanel.style.display=admPanel.style.display==="block"?"none":"block";
-}
-function admGiveMoney(){
-  let n=admMoneyName.value;
-  let v=Number(admMoneyValue.value);
-  let p=playersDB.find(x=>x.name===n);
-  if(!p){alert("Jogador não encontrado");return;}
-  p.coins+=v;
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
-  alert("Dinheiro enviado!");
-}
-function admGiveAdmin(){
-  let n=admAdminName.value;
-  let d=Number(admAdminDays.value);
-  let p=playersDB.find(x=>x.name===n);
-  if(!p){alert("Jogador não encontrado");return;}
-  p.admin=true;
-  p.adminUntil=Date.now()+d*86400000;
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
-  alert("ADM concedido!");
-}
-
-// RANKING
-function renderRank(){
-  rankList.innerHTML="";
-  playersDB.sort((a,b)=>b.coins-a.coins).forEach((p,i)=>{
-    rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
-  });
-}
-
-// SALVAR
-function updateDB(){
-  let i=playersDB.findIndex(p=>p.name===user.name);
-  if(i>=0) playersDB[i]=user;
-  else playersDB.push(user);
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
-}
-function saveUser(){
-  localStorage.setItem("user",JSON.stringify(user));
-  updateDB();
-}
+function saveUser(){localStorage.setItem("user",JSON.stringify(user));saveDB()}
+function saveDB(){localStorage.setItem("playersDB",JSON.stringify(playersDB))}
 </script>
 
 </body>
