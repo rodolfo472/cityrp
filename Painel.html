@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Painel de Jogos</title>
+<title>Painel de Jogos Online</title>
 
 <style>
 body{
@@ -51,12 +51,10 @@ footer{
   text-align:center;
   padding:10px;
   background:#020a18;
-  font-size:14px;
-  opacity:0.7;
 }
 
 button{
-  margin-top:15px;
+  margin-top:10px;
   padding:10px 15px;
   background:#ff4444;
   border:none;
@@ -69,63 +67,51 @@ button{
 
 <body>
 
-<header>🎮 Painel de Jogos</header>
-
-<!-- BOTÃO DE ABRIR O PAINEL (caso queira usar dentro do próprio painel) -->
-<div style="text-align:center;">
-  <button onclick="openPainel()">🎮 Abrir Painel de Jogos</button>
-</div>
+<header>🎮 Jogos Online (Jogáveis)</header>
 
 <div class="container">
 
-  <div class="app" onclick="openApp('https://www.minecraft.net')">
-    <div class="icon">🟩</div>
-    Minecraft
+  <div class="app" onclick="openApp('https://classic.minecraft.net')">
+    <div class="icon">🧱</div>
+    Minecraft Classic
   </div>
 
-  <div class="app" onclick="openApp('https://www.rockstargames.com/gta-v')">
+  <div class="app" onclick="openApp('https://krunker.io')">
+    <div class="icon">🔫</div>
+    Krunker.io
+  </div>
+
+  <div class="app" onclick="openApp('https://www.madalingames.com/game/madalin-cars-multiplayer-3/')">
     <div class="icon">🚗</div>
-    GTA V
+    Madalin Cars
   </div>
 
-  <div class="app" onclick="openApp('https://www.roblox.com')">
+  <div class="app" onclick="openApp('https://www.roblox.com/games')">
     <div class="icon">🟥</div>
     Roblox
   </div>
 
-  <div class="app" onclick="openApp('https://www.epicgames.com/fortnite')">
-    <div class="icon">🟪</div>
-    Fortnite
-  </div>
-
-  <div class="app" onclick="openApp('https://store.steampowered.com')">
-    <div class="icon">💨</div>
-    Steam
+  <div class="app" onclick="openApp('https://shellshock.io')">
+    <div class="icon">🥚</div>
+    Shell Shockers
   </div>
 
   <div class="app" onclick="openApp('https://www.crazygames.com')">
     <div class="icon">🕹️</div>
-    Jogos Online
+    CrazyGames
   </div>
 
 </div>
 
 <footer>
-  <button onclick="voltar()">⬅ Voltar para o jogo</button>
+  <button onclick="voltar()">⬅ Voltar</button>
 </footer>
 
 <script>
-// abre o próprio painel
-function openPainel(){
-  window.location.href = "painel.html";
-}
-
-// abre sites dos jogos
 function openApp(url){
   window.open(url, "_blank");
 }
 
-// volta para o jogo principal
 function voltar(){
   window.location.href = "index.html";
 }
