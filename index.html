@@ -5,52 +5,104 @@
 <title>Sistema Gamer</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b1020;color:#fff}
-.screen{display:none;min-height:100vh;align-items:center;justify-content:center}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b1020;
+  color:#fff;
+}
+.screen{
+  display:none;
+  min-height:100vh;
+  align-items:center;
+  justify-content:center;
+}
 .active{display:flex}
-.box{background:#06172f;width:480px;padding:15px;border-radius:12px;text-align:center}
-
-.menu{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
-.menu button{flex:1}
-
+.box{
+  background:#06172f;
+  width:420px;
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
+}
+.menu{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.menu button{
+  flex:1;
+  background:#1e4fff;
+}
 .section{display:none}
 .section.active{display:block}
 
 .avatar{
-  width:100px;height:100px;border-radius:50%;
-  background:#444;margin:10px auto;
-  border:6px solid transparent;
-  overflow:hidden
+  width:100px;height:100px;
+  border-radius:50%;
+  background:#333;
+  margin:10px auto;
+  border:5px solid transparent;
+  overflow:hidden;
 }
-.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
-.border{width:50px;height:50px;border-radius:50%;border:5px solid;cursor:pointer}
-.gold{border-color:gold}
-.blue{border-color:#00aaff}
-.red{border-color:#ff4444}
-.premium{border-color:#ff00ff;box-shadow:0 0 10px #ff00ff}
+.border{
+  width:45px;height:45px;
+  border-radius:50%;
+  border:5px solid;
+  cursor:pointer;
+}
 
-.borders,.inventory{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+input,button{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  border:none;
+  border-radius:6px;
+}
+button{background:#1e4fff;color:white}
 
-input,button{width:100%;padding:8px;margin-top:6px;border:none;border-radius:5px}
-button{background:#1c4cff;color:#fff}
+.inventory,.borders{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
 
 #admBtn{
-  position:fixed;right:10px;top:50%;
+  position:fixed;
+  right:10px;
+  top:50%;
   transform:translateY(-50%);
-  background:#ff4444;padding:12px;
-  border-radius:10px;display:none;
-  cursor:pointer;z-index:1000
+  background:#ff4444;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
 }
 #admPanel{
-  position:fixed;right:80px;top:50%;
+  position:fixed;
+  right:80px;
+  top:50%;
   transform:translateY(-50%);
-  background:#020a18;padding:15px;
-  width:260px;border-radius:12px;
-  display:none;z-index:1000
+  background:#020a18;
+  padding:15px;
+  width:260px;
+  border-radius:10px;
+  display:none;
 }
 
-.rank{background:#020a18;padding:8px;margin:6px 0;border-radius:6px}
+.rank{
+  background:#020a18;
+  padding:6px;
+  margin:4px 0;
+  border-radius:5px;
+}
 </style>
 </head>
 
@@ -63,7 +115,7 @@ button{background:#1c4cff;color:#fff}
     <input id="loginName" placeholder="Nome">
     <input id="loginPass" type="password" placeholder="Senha">
     <button onclick="login()">Entrar</button>
-    <button onclick="goRegister()">Criar conta</button>
+    <button onclick="showRegister()">Registrar</button>
   </div>
 </div>
 
@@ -73,7 +125,7 @@ button{background:#1c4cff;color:#fff}
     <h2>Registro</h2>
     <input id="regName" placeholder="Nome">
     <input id="regPass" type="password" placeholder="Senha">
-    <button onclick="register()">Registrar</button>
+    <button onclick="register()">Criar conta</button>
     <button onclick="backLogin()">Voltar</button>
   </div>
 </div>
@@ -89,7 +141,7 @@ button{background:#1c4cff;color:#fff}
       <button onclick="openSec('premium')">Premium</button>
       <button onclick="openSec('foto')">Foto</button>
       <button onclick="openSec('ranking')">Ranking</button>
-      <button onclick="openSec('apps')">🎮 Central de Jogos</button>
+      <button onclick="openSec('apps')">🎮 Jogos</button>
     </div>
 
     <!-- PERFIL -->
@@ -98,9 +150,9 @@ button{background:#1c4cff;color:#fff}
       <h3 id="nome"></h3>
       <p>💰 Dinheiro do site: <span id="coins"></span></p>
 
-      <!-- BOTÃO RESGATAR (ADICIONADO) -->
-      <button onclick="resgatarDinheiro()">💸 Resgatar</button>
-      <p id="resgateMsg"></p>
+      <input id="valorResgate" type="number" placeholder="Valor para resgatar">
+      <button onclick="resgatar()">💸 Resgatar</button>
+      <p id="msgResgate"></p>
 
       <p id="status"></p>
       <p id="device"></p>
@@ -108,11 +160,10 @@ button{background:#1c4cff;color:#fff}
 
     <!-- LOJA -->
     <div class="section" id="loja">
-      <h3>Bordas</h3>
       <div class="borders">
-        <div class="border gold" onclick="buyBorder('gold')"></div>
-        <div class="border blue" onclick="buyBorder('#00aaff')"></div>
-        <div class="border red" onclick="buyBorder('#ff4444')"></div>
+        <div class="border" style="border-color:gold" onclick="buyBorder('gold')"></div>
+        <div class="border" style="border-color:#00aaff" onclick="buyBorder('#00aaff')"></div>
+        <div class="border" style="border-color:#ff4444" onclick="buyBorder('#ff4444')"></div>
       </div>
     </div>
 
@@ -123,7 +174,6 @@ button{background:#1c4cff;color:#fff}
 
     <!-- PREMIUM -->
     <div class="section" id="premium">
-      <h3>💎 Premium</h3>
       <button onclick="buyPremium()">Ativar Premium</button>
     </div>
 
@@ -141,14 +191,12 @@ button{background:#1c4cff;color:#fff}
 </div>
 
 <!-- ADM -->
-<div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
+<div id="admBtn" style="display:none" onclick="toggleAdm()">ADM</div>
 
 <div id="admPanel">
-  <h3>👑 PAINEL ADM</h3>
-
-  <h4>Gerar código de dinheiro</h4>
-  <input id="moneyValue" type="number" placeholder="Quantia">
-  <button onclick="generateMoneyCode()">Gerar Código</button>
+  <h3>Gerar código</h3>
+  <input id="moneyValue" type="number" placeholder="Valor">
+  <button onclick="generateCode()">Gerar</button>
   <p id="moneyCode"></p>
 </div>
 
@@ -156,41 +204,72 @@ button{background:#1c4cff;color:#fff}
 const ADM_NAME="Rodolfo";
 const ADM_PASS="rodolfo408*";
 
-let user=null;
-let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
-let moneyCodes=JSON.parse(localStorage.getItem("moneyCodes")||"{}");
+let players = JSON.parse(localStorage.getItem("playersDB")||"[]");
+let moneyCodes = JSON.parse(localStorage.getItem("moneyCodes")||"{}");
+let user = null;
 
-// auto login
-let saved=localStorage.getItem("user");
-if(saved){user=JSON.parse(saved);start();}
+// AUTO LOGIN
+let saved = localStorage.getItem("user");
+if(saved){
+  user = JSON.parse(saved);
+  start();
+}
 
 function detectDevice(){
   return /mobile/i.test(navigator.userAgent)?"📱 Mobile":"💻 PC";
 }
 
-/* LOGIN */
-function login(){
-  let n=loginName.value,p=loginPass.value;
-  if(n===ADM_NAME&&p===ADM_PASS){
-    user={name:n,coins:0,admin:true,premium:false,inventory:[],photo:null,device:detectDevice()};
-    saveUser();start();return;
-  }
-  let u=playersDB.find(x=>x.name===n&&x.pass===p);
-  if(!u){alert("Login inválido");return;}
-  user=u;saveUser();start();
+function showRegister(){
+  loginScreen.classList.remove("active");
+  registerScreen.classList.add("active");
+}
+function backLogin(){
+  registerScreen.classList.remove("active");
+  loginScreen.classList.add("active");
 }
 
-/* REGISTRO */
-function goRegister(){loginScreen.classList.remove("active");registerScreen.classList.add("active")}
-function backLogin(){registerScreen.classList.remove("active");loginScreen.classList.add("active")}
+// REGISTRO
 function register(){
-  let n=regName.value,p=regPass.value;
-  if(playersDB.find(x=>x.name===n)){alert("Nome já existe");return;}
-  user={name:n,pass:p,coins:0,admin:false,premium:false,inventory:[],photo:null,device:detectDevice()};
-  playersDB.push(user);saveUser();start();
+  if(players.find(p=>p.name===regName.value)){
+    alert("Nome já existe");return;
+  }
+  user={
+    name:regName.value,
+    pass:regPass.value,
+    coins:"0",
+    premium:false,
+    admin:false,
+    inventory:[],
+    photo:null,
+    device:detectDevice()
+  };
+  players.push(user);
+  saveAll();
+  start();
 }
 
-/* START */
+// LOGIN
+function login(){
+  if(loginName.value===ADM_NAME && loginPass.value===ADM_PASS){
+    user={
+      name:ADM_NAME,
+      coins:"0",
+      premium:false,
+      admin:true,
+      inventory:[],
+      photo:null,
+      device:detectDevice()
+    };
+    saveAll();
+    start();
+    return;
+  }
+  let u=players.find(p=>p.name===loginName.value && p.pass===loginPass.value);
+  if(!u){alert("Login inválido");return;}
+  user=u;
+  start();
+}
+
 function start(){
   loginScreen.classList.remove("active");
   registerScreen.classList.remove("active");
@@ -205,10 +284,9 @@ function start(){
   if(user.equipped) avatar.style.borderColor=user.equipped;
   if(user.admin) admBtn.style.display="block";
 
-  saveDB();
+  saveAll();
 }
 
-/* MENU */
 function openSec(id){
   if(id==="apps"){window.location.href="painel.html";return;}
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -217,77 +295,92 @@ function openSec(id){
   if(id==="ranking") renderRank();
 }
 
-/* BORDAS */
-function buyBorder(c){if(!user.inventory.includes(c))user.inventory.push(c);equip(c)}
-function equip(c){user.equipped=c;avatar.style.borderColor=c;saveUser()}
+// BORDAS
+function buyBorder(c){
+  if(!user.inventory.includes(c)) user.inventory.push(c);
+  user.equipped=c;
+  avatar.style.borderColor=c;
+  saveAll();
+}
 function renderInv(){
   inv.innerHTML="";
   user.inventory.forEach(b=>{
     let d=document.createElement("div");
-    d.className="border";d.style.borderColor=b;
-    d.onclick=()=>equip(b);inv.appendChild(d);
+    d.className="border";
+    d.style.borderColor=b;
+    d.onclick=()=>{user.equipped=b;avatar.style.borderColor=b;saveAll()};
+    inv.appendChild(d);
   });
 }
 
-/* PREMIUM */
+// PREMIUM
 function buyPremium(){
   user.premium=true;
-  user.inventory.push("#ff00ff");
-  equip("#ff00ff");
-  saveUser();
+  saveAll();
 }
 
-/* FOTO */
+// FOTO
 function setPhoto(e){
   let r=new FileReader();
-  r.onload=()=>{user.photo=r.result;avatar.innerHTML=`<img src="${r.result}">`;saveUser()}
+  r.onload=()=>{
+    user.photo=r.result;
+    avatar.innerHTML=`<img src="${r.result}">`;
+    saveAll();
+  }
   r.readAsDataURL(e.target.files[0]);
 }
 
-/* ADM CÓDIGO */
-function toggleAdm(){admPanel.style.display=admPanel.style.display==="block"?"none":"block"}
-function generateMoneyCode(){
-  if(!user.admin)return;
-  let v=parseInt(moneyValue.value);
+// RESGATE (BigInt)
+function resgatar(){
+  let msg=document.getElementById("msgResgate");
+  let valor=document.getElementById("valorResgate").value;
+  let saldo=BigInt(user.coins);
+
+  if(!valor || BigInt(valor)<=0n){
+    msg.innerText="Digite um valor válido";
+    return;
+  }
+  if(BigInt(valor)>saldo){
+    msg.innerText="Você não tem dinheiro suficiente.";
+    return;
+  }
+
+  user.coins=(saldo-BigInt(valor)).toString();
+  coins.innerText=user.coins;
+  msg.style.color="lime";
+  msg.innerText="Robux foi resgatado para sua conta, chegará daqui a um ano.";
+  saveAll();
+}
+
+// ADM
+function toggleAdm(){
+  admPanel.style.display=admPanel.style.display==="block"?"none":"block";
+}
+function generateCode(){
+  let v=moneyValue.value;
   let c="DIN-"+Math.random().toString(36).substr(2,6).toUpperCase();
   moneyCodes[c]=v;
-  localStorage.setItem("moneyCodes",JSON.stringify(moneyCodes));
-  moneyCode.innerText="Código: "+c;
+  moneyCode.innerText=c;
+  saveAll();
 }
 
-/* RESGATAR DINHEIRO (NOVO) */
-function resgatarDinheiro(){
-  let msg=document.getElementById("resgateMsg");
-  if(user.coins>0){
-    user.coins=0;
-    saveUser();
-    coins.innerText=user.coins;
-    msg.style.color="#55ff55";
-    msg.innerText="Robux foi resgatado para sua conta, chegará daqui a um ano.";
-  }else{
-    msg.style.color="#ff5555";
-    msg.innerText="Você não tem dinheiro suficiente.";
-  }
-}
-
-/* RANKING */
+// RANKING
 function renderRank(){
   rankList.innerHTML="";
-  playersDB.sort((a,b)=>b.coins-a.coins).forEach((p,i)=>{
-    rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
-  });
+  [...players].sort((a,b)=>BigInt(b.coins)-BigInt(a.coins))
+    .forEach((p,i)=>{
+      rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
+    });
 }
 
-/* SAVE */
-function saveUser(){
+// SAVE
+function saveAll(){
+  let i=players.findIndex(p=>p.name===user.name);
+  if(i>=0) players[i]=user;
+  else players.push(user);
+  localStorage.setItem("playersDB",JSON.stringify(players));
   localStorage.setItem("user",JSON.stringify(user));
-  saveDB();
-}
-function saveDB(){
-  let i=playersDB.findIndex(p=>p.name===user.name);
-  if(i>=0) playersDB[i]=user;
-  else playersDB.push(user);
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
+  localStorage.setItem("moneyCodes",JSON.stringify(moneyCodes));
 }
 </script>
 
