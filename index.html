@@ -5,136 +5,73 @@
 <title>Sistema Gamer</title>
 
 <style>
-/* ===== FUNDO ===== */
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background-image:url("fundo.jpg");
-  background-size:cover;
-  background-position:center;
-  background-attachment:fixed;
+  background:#0b1020;
   color:#fff;
 }
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  z-index:-1;
+.screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
-/* ===== TELAS ===== */
-.screen{display:none;min-height:100vh;align-items:center;justify-content:center;}
-.active{display:flex}
-
-/* ===== BOX ===== */
 .box{
   background:#06172f;
   padding:20px;
-  width:320px;
-  border-radius:10px;
+  width:380px;
+  border-radius:12px;
   text-align:center;
 }
-input,button{
+.avatar{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  background:#444;
+  margin:10px auto;
+  border:6px solid transparent;
+}
+
+/* BORDAS */
+.borders,.inventory{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top:10px;
+}
+.border{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  cursor:pointer;
+  border:5px solid;
+  transition:transform .2s;
+}
+.border:hover{transform:scale(1.1)}
+
+.gold{border-color:gold}
+.blue{border-color:#00aaff}
+.red{border-color:#ff4444}
+
+/* ADM */
+.admin-panel{
+  margin-top:15px;
+  background:#020a18;
+  padding:10px;
+  border-radius:8px;
+}
+
+button,input{
   width:100%;
   padding:8px;
-  margin-top:8px;
+  margin-top:6px;
   border:none;
+  border-radius:5px;
 }
 button{
-  background:#00aaff;
-  font-weight:bold;
-  cursor:pointer;
-}
-.small{font-size:12px;color:#ccc;cursor:pointer}
-
-/* ===== PLAYER BOX ===== */
-#playerBox{
-  position:fixed;
-  top:10px;
-  left:10px;
-  width:230px;
-  background:#06172f;
-  padding:10px;
-  z-index:10;
-}
-
-/* ===== AVATAR ===== */
-#avatarWrapper{
-  position:relative;
-  width:90px;
-  height:90px;
-  margin:auto;
-}
-#avatar{
-  width:90px;
-  height:90px;
-  position:relative;
-  z-index:2;
-}
-#photoBtn{
-  position:absolute;
-  bottom:-6px;
-  right:-6px;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  cursor:pointer;
-}
-
-/* ===== ADM BORDA ===== */
-.adm-snake::before{
-  content:"";
-  position:absolute;
-  inset:-6px;
-  background:linear-gradient(90deg,#00ff88,#00ffaa,#00ff88);
-  filter:blur(6px);
-  animation:snake 2s linear infinite;
-}
-@keyframes snake{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
-
-/* ===== INFO ===== */
-#playerName{font-weight:bold}
-#playerName.premium{
-  color:#00ffaa;
-  text-shadow:0 0 8px #00ffaa;
-}
-#playerPremium{font-size:11px;color:#ffd700}
-#playerCoins{color:gold}
-#playerTime{font-size:11px}
-
-/* ===== MENUS ===== */
-.menu{
-  position:fixed;
-  right:10px;
-  top:50%;
-  transform:translateY(-50%);
-  background:#021024;
-  padding:10px;
-  width:230px;
-  display:none;
-  z-index:9;
-}
-.hidden{display:none}
-
-/* ===== FEEDBACK ===== */
-.feedback{font-size:11px;height:14px}
-.ok{color:#00ff88}
-.err{color:#ff5555}
-
-/* ===== BOTÃO RANK ===== */
-#rankBtn{
-  position:fixed;
-  right:10px;
-  bottom:20px;
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  font-size:22px;
-  background:#ffd700;
+  background:#1c4cff;
+  color:#fff;
   cursor:pointer;
 }
 </style>
@@ -142,312 +79,148 @@ button{
 
 <body>
 
-<!-- SONS -->
-<audio id="soundError" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
-<audio id="soundSuccess" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
-
-<!-- LOGIN -->
-<div id="loginScreen" class="screen active">
+<div class="screen">
   <div class="box">
-    <h3>Login</h3>
-    <input id="loginUser" placeholder="Usuário">
-    <input id="loginPass" type="password" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-    <div class="small" onclick="goRegister()">Registrar</div>
-    <div class="small" onclick="goRecover()">Esqueci a senha</div>
-    <div id="loginMsg"></div>
-  </div>
-</div>
 
-<!-- REGISTER -->
-<div id="registerScreen" class="screen">
-  <div class="box">
-    <h3>Registrar</h3>
-    <input id="regUser" placeholder="Usuário">
-    <input id="regPass" type="password" placeholder="Senha">
-    <button onclick="register()">Criar conta</button>
-    <button onclick="goLogin()">Voltar</button>
-    <div id="regMsg"></div>
-  </div>
-</div>
-
-<!-- RECOVER -->
-<div id="recoverScreen" class="screen">
-  <div class="box">
-    <h3>Recuperar senha</h3>
-    <input id="recUser" placeholder="Usuário">
-    <input id="recPass" type="password" placeholder="Nova senha">
-    <button onclick="recover()">Salvar</button>
-    <button onclick="goLogin()">Voltar</button>
-    <div id="recMsg"></div>
-  </div>
-</div>
-
-<!-- SITE -->
-<div id="siteScreen" class="screen">
-
-  <div id="playerBox">
-    <div id="avatarWrapper">
-      <img id="avatar" src="https://i.imgur.com/6VBx3io.png">
-      <button id="photoBtn">📷</button>
+    <!-- PERFIL -->
+    <div class="profile">
+      <div class="avatar" id="avatar"></div>
+      <h3 id="playerName"></h3>
+      <p>💰 Moedas: <span id="coins"></span></p>
+      <p id="device"></p>
     </div>
 
-    <div id="playerName"></div>
-    <div id="playerPremium"></div>
-    <div id="playerCoins"></div>
-    <div id="playerTime"></div>
+    <!-- LOJA -->
+    <h3>Comprar Bordas</h3>
+    <div class="borders">
+      <div class="border gold" onclick="buyBorder('gold',200)"></div>
+      <div class="border blue" onclick="buyBorder('#00aaff',150)"></div>
+      <div class="border red" onclick="buyBorder('#ff4444',100)"></div>
+    </div>
 
-    <button onclick="toggleMenu('borderMenu')">🎨 Bordas</button>
-    <button onclick="toggleMenu('inventoryMenu')">🎒 Inventário</button>
-    <button onclick="toggleMenu('prizeMenu')">🏆 Prêmio</button>
-    <button onclick="toggleMenu('adminMenu')" id="adminBtn">👑 ADM</button>
-    <button onclick="logout()">Sair</button>
+    <!-- INVENTÁRIO -->
+    <h3>Inventário</h3>
+    <div class="inventory" id="inventory"></div>
 
-    <div id="feedback" class="feedback"></div>
+    <!-- PAINEL ADM -->
+    <div class="admin-panel" id="adminPanel" style="display:none">
+      <h3>Painel ADM</h3>
+      <input id="admName" placeholder="Nome do jogador">
+      <button onclick="giveAdmin()">Dar ADM</button>
+    </div>
+
   </div>
 </div>
 
-<input type="file" id="photoInput" class="hidden" accept="image/*">
-
-<!-- BORDAS -->
-<div id="borderMenu" class="menu">
-  <h3>Bordas</h3>
-  <button onclick="buyBorder('Azul',100)">Azul – 100</button>
-  <button onclick="buyBorder('Roxa',500)">Roxa – 500</button>
-</div>
-
-<!-- INVENTÁRIO -->
-<div id="inventoryMenu" class="menu">
-  <h3>🎒 Inventário</h3>
-  <ul id="invList"></ul>
-</div>
-
-<!-- PRÊMIO -->
-<div id="prizeMenu" class="menu">
-  <h3>🏆 Premium</h3>
-  <button onclick="buyPremium()">Comprar Premium (5000)</button>
-</div>
-
-<!-- ADM -->
-<div id="adminMenu" class="menu">
-  <h3>👑 ADM</h3>
-  <input id="giveUser" placeholder="Jogador">
-  <input id="giveValue" type="number" placeholder="Moedas">
-  <button onclick="giveMoney()">Dar dinheiro</button>
-</div>
-
-<!-- RANK -->
-<button id="rankBtn" onclick="toggleMenu('rankMenu')">🏆</button>
-<div id="rankMenu" class="menu">
-  <h3>Ranking</h3>
-  <h4>⏱️ Tempo</h4>
-  <ol id="rankTime"></ol>
-  <h4>💰 Moedas</h4>
-  <ol id="rankCoins"></ol>
-</div>
+<audio id="buySound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3">
+</audio>
 
 <script>
-const ADMIN="Rodolfo", ADMIN_PASS="rodolfo408*";
-let users=JSON.parse(localStorage.getItem("users"))||{};
-let currentUser=null,isADM=false;
-let coins=0,time=0,timer;
-let inventory=[],premium=false;
+// =====================
+// DADOS
+// =====================
+let players = ["Player1","Joao","Maria"];
+let admins = ["Player1"];
 
-/* ===== TELAS ===== */
-function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-function goLogin(){show("loginScreen")}
-function goRegister(){show("registerScreen")}
-function goRecover(){show("recoverScreen")}
-
-/* ===== REGISTER ===== */
-function register(){
-  const u=regUser.value.trim(), p=regPass.value.trim();
-  if(!u||!p) return regMsg.innerText="Preencha tudo";
-  if(users[u]) return regMsg.innerText="Nome já existe";
-  users[u]=p;
-  localStorage.setItem("users",JSON.stringify(users));
-  regMsg.innerText="Conta criada!";
-}
-
-/* ===== LOGIN ===== */
-function login(){
-  const u=loginUser.value,p=loginPass.value;
-  if(users[u]===p || (u===ADMIN&&p===ADMIN_PASS)){
-    currentUser=u;
-    isADM=(u===ADMIN&&p===ADMIN_PASS);
-    localStorage.setItem("currentUser",u);
-    enterSite();
-  }else loginMsg.innerText="Usuário ou senha errada";
-}
-
-/* ===== RECOVER ===== */
-function recover(){
-  const u=recUser.value,p=recPass.value;
-  if(!users[u]) return recMsg.innerText="Usuário não existe";
-  users[u]=p;
-  localStorage.setItem("users",JSON.stringify(users));
-  recMsg.innerText="Senha alterada!";
-}
-
-/* ===== SITE ===== */
-function enterSite(){
-  show("siteScreen");
-
-  coins=isADM?Infinity:Number(localStorage.getItem("coins_"+currentUser))||0;
-  time=Number(localStorage.getItem("time_"+currentUser))||0;
-  inventory=JSON.parse(localStorage.getItem("inv_"+currentUser))||[];
-  premium=localStorage.getItem("premium_"+currentUser)==="1";
-
-  playerName.innerText=isADM?"👑 "+currentUser+" (ADM)":currentUser;
-  playerCoins.innerText="💰 "+(isADM?"∞":coins);
-  playerTime.innerText="⏱️ "+time+"s";
-
-  if(premium){
-    playerPremium.innerText="⭐ Premium";
-    playerName.classList.add("premium");
-  }else{
-    playerPremium.innerText="";
-    playerName.classList.remove("premium");
-  }
-
-  adminBtn.style.display=isADM?"block":"none";
-  avatarWrapper.classList.toggle("adm-snake",isADM);
-
-  const img=localStorage.getItem("avatar_"+currentUser);
-  if(img) avatar.src=img;
-
-  updateInv();
-  updateRanking();
-
-  clearInterval(timer);
-  timer=setInterval(()=>{
-    time++;
-    localStorage.setItem("time_"+currentUser,time);
-    playerTime.innerText="⏱️ "+time+"s";
-    if(!isADM){
-      coins++;
-      localStorage.setItem("coins_"+currentUser,coins);
-      playerCoins.innerText="💰 "+coins;
-    }
-    updateRanking();
-  },1000);
-}
-
-/* ===== FOTO ===== */
-photoBtn.onclick=()=>photoInput.click();
-photoInput.onchange=e=>{
-  const r=new FileReader();
-  r.onload=()=>{
-    avatar.src=r.result;
-    localStorage.setItem("avatar_"+currentUser,r.result);
-  }
-  r.readAsDataURL(e.target.files[0]);
+let player = {
+  name: "Player1",
+  coins: 500,
+  equippedBorder: null,
+  inventory: []
 };
 
-/* ===== MENUS ===== */
-function toggleMenu(id){
-  document.querySelectorAll(".menu").forEach(m=>m.style.display="none");
-  const el=document.getElementById(id);
-  el.style.display=el.style.display==="block"?"none":"block";
-  if(id==="rankMenu") updateRanking();
+// =====================
+// INICIAR
+// =====================
+playerName.innerText = player.name;
+coins.innerText = player.coins;
+
+if (/Android|iPhone|iPad/i.test(navigator.userAgent)){
+  device.innerText = "📱 Mobile";
+}else{
+  device.innerText = "💻 PC";
 }
 
-/* ===== FEEDBACK + SOM ===== */
-function msg(t,c){
-  feedback.innerText=t;
-  feedback.className="feedback "+c;
-  if(c==="ok"){soundSuccess.play()}else{soundError.play()}
-  setTimeout(()=>feedback.innerText="",2000);
+if (admins.includes(player.name)){
+  adminPanel.style.display = "block";
 }
 
-/* ===== BORDAS ===== */
-function buyBorder(name,price){
-  if(!isADM&&coins<price) return msg("❌ Sem dinheiro","err");
-  if(!inventory.includes(name)){
-    inventory.push(name);
-    localStorage.setItem("inv_"+currentUser,JSON.stringify(inventory));
+// =====================
+// COMPRAR BORDA
+// =====================
+function buyBorder(color, price){
+  if(player.coins < price){
+    alert("Moedas insuficientes!");
+    return;
   }
-  if(!isADM){
-    coins-=price;
-    localStorage.setItem("coins_"+currentUser,coins);
-    playerCoins.innerText="💰 "+coins;
-  }
-  updateInv();
-  msg("✔ Compra realizada","ok");
-}
 
-/* ===== INVENTÁRIO ===== */
-function updateInv(){
-  invList.innerHTML="";
-  inventory.forEach(i=>{
-    const li=document.createElement("li");
-    li.innerText=i;
-    invList.appendChild(li);
-  });
-}
-
-/* ===== PREMIUM ===== */
-function buyPremium(){
-  if(premium) return msg("✔ Já é Premium","ok");
-  if(!isADM&&coins<5000) return msg("❌ Sem dinheiro","err");
-  premium=true;
-  localStorage.setItem("premium_"+currentUser,"1");
-  playerPremium.innerText="⭐ Premium";
-  playerName.classList.add("premium");
-  if(!isADM){
-    coins-=5000;
-    localStorage.setItem("coins_"+currentUser,coins);
-    playerCoins.innerText="💰 "+coins;
-  }
-  msg("✔ Compra realizada","ok");
-}
-
-/* ===== ADM ===== */
-function giveMoney(){
-  if(!isADM) return;
-  const u=giveUser.value,v=Number(giveValue.value);
-  const c=Number(localStorage.getItem("coins_"+u))||0;
-  localStorage.setItem("coins_"+u,c+v);
-  msg("✔ Dinheiro enviado","ok");
-}
-
-/* ===== RANKING ===== */
-function updateRanking(){
-  const t=[],c=[];
-  for(let k in localStorage){
-    if(k.startsWith("time_")){
-      t.push({u:k.replace("time_",""),v:Number(localStorage.getItem(k))||0});
-    }
-    if(k.startsWith("coins_")){
-      c.push({u:k.replace("coins_",""),v:Number(localStorage.getItem(k))||0});
+  // Se não tem borda equipada
+  if(player.equippedBorder === null){
+    player.equippedBorder = color;
+    avatar.style.borderColor = color;
+  }else{
+    // Já tem → vai pro inventário
+    if(!player.inventory.includes(color)){
+      player.inventory.push(color);
     }
   }
-  t.sort((a,b)=>b.v-a.v);
-  c.sort((a,b)=>b.v-a.v);
 
-  rankTime.innerHTML="";
-  rankCoins.innerHTML="";
-  t.slice(0,10).forEach(x=>{
-    const li=document.createElement("li");
-    li.innerText=x.u+" — "+x.v+"s";
-    rankTime.appendChild(li);
-  });
-  c.slice(0,10).forEach(x=>{
-    const li=document.createElement("li");
-    li.innerText=x.u+" — 💰 "+x.v;
-    rankCoins.appendChild(li);
+  player.coins -= price;
+  coins.innerText = player.coins;
+  buySound.play();
+  renderInventory();
+}
+
+// =====================
+// EQUIPAR BORDA DO INVENTÁRIO
+// =====================
+function equipBorder(color){
+  // borda atual vai para inventário
+  if(player.equippedBorder !== null){
+    player.inventory.push(player.equippedBorder);
+  }
+
+  // remove a nova do inventário
+  player.inventory = player.inventory.filter(b => b !== color);
+
+  // equipa
+  player.equippedBorder = color;
+  avatar.style.borderColor = color;
+
+  renderInventory();
+}
+
+// =====================
+// MOSTRAR INVENTÁRIO
+// =====================
+function renderInventory(){
+  inventory.innerHTML = "";
+  player.inventory.forEach(color=>{
+    let div = document.createElement("div");
+    div.className = "border";
+    div.style.borderColor = color;
+    div.onclick = ()=>equipBorder(color);
+    inventory.appendChild(div);
   });
 }
 
-/* ===== AUTO LOGIN ===== */
-const saved=localStorage.getItem("currentUser");
-if(saved){
-  currentUser=saved;
-  isADM=(saved===ADMIN);
-  enterSite();
+// =====================
+// DAR ADM
+// =====================
+function giveAdmin(){
+  let name = admName.value.trim();
+  if(!players.includes(name)){
+    alert("Jogador não encontrado");
+    return;
+  }
+  if(admins.includes(name)){
+    alert("Já é ADM");
+    return;
+  }
+  admins.push(name);
+  alert(name + " agora é ADM!");
+  admName.value="";
 }
 </script>
 
