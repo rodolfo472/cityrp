@@ -41,6 +41,7 @@ body{
   background:#444;
   margin:10px auto;
   border:6px solid transparent;
+  box-shadow:0 0 15px transparent;
 }
 
 /* BORDAS */
@@ -59,8 +60,16 @@ body{
 .gold{border-color:gold}
 .blue{border-color:#00aaff}
 .red{border-color:#ff4444}
+.adminBorder{
+  border-color:gold;
+  box-shadow:0 0 10px gold;
+}
+.premiumBorder{
+  border-color:#ff00ff;
+  box-shadow:0 0 10px #ff00ff;
+}
 
-/* INPUTS */
+/* INPUT */
 input,button{
   width:100%;
   padding:8px;
@@ -71,7 +80,6 @@ input,button{
 button{
   background:#1c4cff;
   color:#fff;
-  cursor:pointer;
 }
 
 /* ADM MENU */
@@ -86,7 +94,6 @@ button{
   cursor:pointer;
   display:none;
 }
-
 #admPanel{
   position:fixed;
   right:70px;
@@ -128,6 +135,7 @@ button{
       <div class="avatar" id="avatar"></div>
       <h3 id="playerName"></h3>
       <p>💰 Moedas: <span id="coins"></span></p>
+      <p id="status"></p>
     </div>
 
     <!-- LOJA -->
@@ -149,22 +157,12 @@ button{
   </div>
 </div>
 
-<!-- BOTÃO ADM -->
+<!-- ADM -->
 <div id="admButton" onclick="toggleAdmPanel()">ADM MENU</div>
 
-<!-- PAINEL ADM -->
 <div id="admPanel">
-  <h3>👑 Painel ADM</h3>
-
-  <h4>Dar dinheiro</h4>
-  <input id="moneyPlayer" placeholder="Jogador">
-  <input id="moneyAmount" type="number" placeholder="Quantia">
-  <button onclick="giveMoney()">Dar dinheiro</button>
-
-  <h4>Dar ADM</h4>
-  <input id="admPlayer" placeholder="Jogador">
-  <input id="admDays" type="number" placeholder="Dias">
-  <button onclick="giveAdmin()">Dar ADM</button>
+  <h3>Painel ADM</h3>
+  <button onclick="givePremium()">Dar Premium</button>
 </div>
 
 <audio id="buySound">
@@ -172,27 +170,36 @@ button{
 </audio>
 
 <script>
-// USUÁRIOS EXEMPLO
-let users = [
-  {name:"Rodolfo", pass:"rodolfo408*", coins:1000, adminUntil:Infinity}
-];
-
-let currentUser = null;
+let users=[{name:"Rodolfo",pass:"rodolfo408*",admin:true,premium:true}];
+let currentUser=null;
 
 // AUTO LOGIN
-let saved = localStorage.getItem("user");
+let saved=localStorage.getItem("user");
 if(saved){
-  currentUser = JSON.parse(saved);
+  currentUser=JSON.parse(saved);
   startGame();
 }
 
-// LOGIN
 function login(){
-  let n=loginName.value, p=loginPass.value;
-  let u=users.find(x=>x.name===n && x.pass===p);
+  let u=users.find(x=>x.name===loginName.value && x.pass===loginPass.value);
   if(!u){alert("Login inválido");return;}
-  currentUser = {...u, inventory:[], equipped:null};
-  localStorage.setItem("user",JSON.stringify(currentUser));
+  currentUser={
+    name:u.name,
+    admin:u.admin,
+    premium:u.premium,
+    coins:999999,
+    inventory:[],
+    equipped:null
+  };
+
+  if(u.admin){
+    currentUser.inventory.push("ADMIN");
+  }
+  if(u.premium){
+    currentUser.inventory.push("PREMIUM");
+  }
+
+  save();
   startGame();
 }
 
@@ -200,79 +207,77 @@ function startGame(){
   loginScreen.classList.remove("active");
   gameScreen.classList.add("active");
   playerName.innerText=currentUser.name;
-  coins.innerText=currentUser.coins;
-  checkAdmin();
+  updateCoins();
+  updateStatus();
+  if(currentUser.admin) admButton.style.display="block";
 }
 
-// MENU
+function updateCoins(){
+  coins.innerText = "∞";
+}
+
+function updateStatus(){
+  status.innerText =
+    currentUser.admin ? "👑 ADM" :
+    currentUser.premium ? "💎 Premium" : "Jogador";
+}
+
 function openSection(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(id==="inventory") renderInventory();
 }
 
-// BORDAS
 function buyBorder(color,price){
-  if(currentUser.coins<price){alert("Sem moedas");return;}
-  currentUser.coins-=price;
-  coins.innerText=currentUser.coins;
-
+  if(!currentUser.admin && !currentUser.premium){
+    currentUser.coins-=price;
+  }
   if(!currentUser.equipped){
     currentUser.equipped=color;
-    avatar.style.borderColor=color;
   }else{
     currentUser.inventory.push(color);
   }
+  avatar.style.borderColor=color;
   buySound.play();
   save();
 }
 
-function equipBorder(color){
-  currentUser.inventory=currentUser.inventory.filter(b=>b!==color);
-  if(currentUser.equipped) currentUser.inventory.push(currentUser.equipped);
-  currentUser.equipped=color;
-  avatar.style.borderColor=color;
-  renderInventory();
-  save();
+function equipBorder(type){
+  if(type==="ADMIN"){
+    avatar.style.borderColor="gold";
+    avatar.style.boxShadow="0 0 20px gold";
+  }else if(type==="PREMIUM"){
+    avatar.style.borderColor="#ff00ff";
+    avatar.style.boxShadow="0 0 20px #ff00ff";
+  }else{
+    avatar.style.borderColor=type;
+    avatar.style.boxShadow="none";
+  }
 }
 
 function renderInventory(){
   inventoryList.innerHTML="";
-  currentUser.inventory.forEach(c=>{
+  currentUser.inventory.forEach(b=>{
     let d=document.createElement("div");
     d.className="border";
-    d.style.borderColor=c;
-    d.onclick=()=>equipBorder(c);
+    if(b==="ADMIN"){d.classList.add("adminBorder")}
+    else if(b==="PREMIUM"){d.classList.add("premiumBorder")}
+    else d.style.borderColor=b;
+    d.onclick=()=>equipBorder(b);
     inventoryList.appendChild(d);
   });
 }
 
-// ADM
-function checkAdmin(){
-  if(Date.now() < currentUser.adminUntil){
-    admButton.style.display="block";
-  }
-}
-
 function toggleAdmPanel(){
-  admPanel.style.display = admPanel.style.display==="block"?"none":"block";
+  admPanel.style.display=admPanel.style.display==="block"?"none":"block";
 }
 
-function giveMoney(){
-  let q=Number(moneyAmount.value);
-  if(q<=0){alert("Quantia inválida");return;}
-  currentUser.coins+=q;
-  coins.innerText=currentUser.coins;
+function givePremium(){
+  currentUser.premium=true;
+  currentUser.inventory.push("PREMIUM");
+  updateStatus();
   save();
-  alert("Dinheiro enviado");
-}
-
-function giveAdmin(){
-  let d=Number(admDays.value);
-  if(d<=0){alert("Dias inválidos");return;}
-  currentUser.adminUntil = Date.now() + d*86400000;
-  alert("ADM dado por "+d+" dias");
-  save();
+  alert("Premium ativado");
 }
 
 function save(){
