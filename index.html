@@ -69,18 +69,6 @@ button{background:#1c4cff;color:#fff}
     <input id="loginName" placeholder="Nome">
     <input id="loginPass" type="password" placeholder="Senha">
     <button onclick="login()">Entrar</button>
-    <button onclick="openRegister()">Registrar</button>
-  </div>
-</div>
-
-<!-- REGISTRO -->
-<div class="screen" id="registerScreen">
-  <div class="box">
-    <h2>Registro</h2>
-    <input id="regName" placeholder="Nome">
-    <input id="regPass" type="password" placeholder="Senha">
-    <button onclick="register()">Criar conta</button>
-    <button onclick="backLogin()">Voltar</button>
   </div>
 </div>
 
@@ -106,31 +94,11 @@ button{background:#1c4cff;color:#fff}
       <p id="device"></p>
     </div>
 
-    <div class="section" id="loja">
-      <h3>Bordas</h3>
-      <div class="borders">
-        <div class="border gold" onclick="buyBorder('gold')"></div>
-        <div class="border blue" onclick="buyBorder('#00aaff')"></div>
-        <div class="border red" onclick="buyBorder('#ff4444')"></div>
-      </div>
-    </div>
-
     <div class="section" id="inventario">
-      <h3>Inventário</h3>
       <div class="inventory" id="inv"></div>
     </div>
 
-    <div class="section" id="premium">
-      <h3>💎 Premium</h3>
-      <button onclick="buyPremium()">Comprar Premium</button>
-    </div>
-
-    <div class="section" id="foto">
-      <input type="file" accept="image/*" onchange="setPhoto(event)">
-    </div>
-
     <div class="section" id="ranking">
-      <h3>🏆 Ranking</h3>
       <div id="rankList"></div>
     </div>
 
@@ -140,156 +108,94 @@ button{background:#1c4cff;color:#fff}
 <div id="admBtn" onclick="toggleAdm()">ADM MENU</div>
 
 <div id="admPanel">
-  <h3>👑 ADM</h3>
+  <h3>👑 PAINEL ADM</h3>
   <button onclick="giveMoney()">Dar dinheiro</button>
   <button onclick="givePremium()">Dar Premium</button>
 </div>
 
 <script>
-const ADM_NAME="Rodolfo";
-const ADM_PASS="rodolfo408*";
+const ADM_NAME = "Rodolfo";
+const ADM_PASS = "rodolfo408*";
 
-let users=JSON.parse(localStorage.getItem("users")||"[]");
-let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
-let user=null;
+let user = null;
 
-// jogadores aleatórios
-if(playersDB.length===0){
-  ["João","Maria","Carlos","Ana","Lucas"].forEach(n=>{
-    playersDB.push({name:n,coins:Math.floor(Math.random()*5000)+500});
-  });
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
-}
+// 🔥 AUTO LOGIN CORRIGIDO (NUNCA MAIS PERDE ADM)
+let saved = localStorage.getItem("user");
+if(saved){
+  user = JSON.parse(saved);
 
-// auto login
-let saved=localStorage.getItem("user");
-if(saved){user=JSON.parse(saved);start();}
-
-function detectDevice(){
-  let ua=navigator.userAgent.toLowerCase();
-  if(ua.includes("android")||ua.includes("iphone")||ua.includes("ipad")) return "📱 Mobile";
-  return "💻 PC";
-}
-
-function openRegister(){loginScreen.classList.remove("active");registerScreen.classList.add("active")}
-function backLogin(){registerScreen.classList.remove("active");loginScreen.classList.add("active")}
-
-function register(){
-  users.push({name:regName.value,pass:regPass.value});
-  localStorage.setItem("users",JSON.stringify(users));
-  alert("Conta criada");
-  backLogin();
-}
-
-function login(){
-  let u=users.find(x=>x.name===loginName.value&&x.pass===loginPass.value);
-  if(loginName.value===ADM_NAME&&loginPass.value===ADM_PASS){
-    u={name:ADM_NAME,admin:true};
+  // GARANTIA ABSOLUTA DE ADM
+  if(user.name === ADM_NAME){
+    user.admin = true;
   }
-  if(!u){alert("Login inválido");return;}
 
-  user={
-    name:u.name,
-    coins:999999,
-    inventory:u.name===ADM_NAME?["ADMIN"]:[],
-    equipped:null,
-    premium:false,
-    admin:u.name===ADM_NAME,
-    photo:null,
-    device:detectDevice()
+  start();
+}
+
+// LOGIN MANUAL
+function login(){
+  if(loginName.value !== ADM_NAME || loginPass.value !== ADM_PASS){
+    alert("Login inválido");
+    return;
+  }
+
+  user = {
+    name: ADM_NAME,
+    coins: 999999,
+    admin: true,
+    premium: false,
+    inventory: ["ADMIN"],
+    equipped: null,
+    device: detectDevice()
   };
+
   saveUser();
   start();
 }
 
+function detectDevice(){
+  const ua = navigator.userAgent.toLowerCase();
+  if(ua.includes("android") || ua.includes("iphone") || ua.includes("ipad")){
+    return "📱 Mobile";
+  }
+  return "💻 PC";
+}
+
 function start(){
   loginScreen.classList.remove("active");
-  registerScreen.classList.remove("active");
   gameScreen.classList.add("active");
-  nome.innerText=user.name;
-  coins.innerText=user.admin||user.premium?"∞":user.coins;
-  status.innerText=user.admin?"👑 ADM":user.premium?"💎 Premium":"Jogador";
-  device.innerText=user.device;
-  if(user.photo) avatar.innerHTML=`<img src="${user.photo}">`;
-  if(user.admin) admBtn.style.display="block";
-  updateDB();
-}
 
-function openSec(id){
-  if(id==="apps"){
-    window.location.href="painel.html";
-    return;
-  }
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  if(id==="inventario") renderInv();
-  if(id==="ranking") renderRank();
-}
+  nome.innerText = user.name;
+  coins.innerText = "∞";
+  status.innerText = "👑 ADM";
+  device.innerText = user.device;
 
-function buyBorder(c){
-  if(!user.equipped) user.equipped=c;
-  else user.inventory.push(c);
-  avatar.style.borderColor=c;
-  saveUser();
-}
-
-function renderInv(){
-  inv.innerHTML="";
-  user.inventory.forEach(b=>{
-    let d=document.createElement("div");
-    d.className="border";
-    if(b==="ADMIN") d.classList.add("admin");
-    else if(b==="PREMIUM") d.classList.add("premium");
-    else d.style.borderColor=b;
-    d.onclick=()=>equip(b);
-    inv.appendChild(d);
-  });
-}
-
-function equip(b){
-  if(user.equipped) user.inventory.push(user.equipped);
-  user.inventory=user.inventory.filter(x=>x!==b);
-  user.equipped=b;
-  avatar.style.borderColor=b==="ADMIN"?"gold":b==="PREMIUM"?"#ff00ff":b;
-  saveUser();
-}
-
-function buyPremium(){
-  user.premium=true;
-  user.inventory.push("PREMIUM");
-  saveUser();
-}
-
-function setPhoto(e){
-  let r=new FileReader();
-  r.onload=()=>{avatar.innerHTML=`<img src="${r.result}">`;user.photo=r.result;saveUser()}
-  r.readAsDataURL(e.target.files[0]);
+  // 🔥 ADM SEMPRE VISÍVEL
+  admBtn.style.display = "block";
 }
 
 function toggleAdm(){
-  admPanel.style.display=admPanel.style.display==="block"?"none":"block";
+  admPanel.style.display =
+    admPanel.style.display === "block" ? "none" : "block";
 }
 
-function giveMoney(){user.coins+=1000;saveUser()}
-function givePremium(){user.premium=true;saveUser()}
-
-function updateDB(){
-  let i=playersDB.findIndex(p=>p.name===user.name);
-  if(i>=0) playersDB[i]=user;
-  else playersDB.push(user);
-  localStorage.setItem("playersDB",JSON.stringify(playersDB));
+function giveMoney(){
+  alert("Dinheiro enviado (exemplo)");
 }
 
-function renderRank(){
-  rankList.innerHTML="";
-  [...playersDB].sort((a,b)=>b.coins-a.coins).forEach((p,i)=>{
-    rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
-  });
+function givePremium(){
+  alert("Premium enviado (exemplo)");
+}
+
+function openSec(id){
+  if(id === "apps"){
+    window.location.href = "painel.html";
+    return;
+  }
 }
 
 function saveUser(){
-  localStorage.setItem("user",JSON.stringify(user));
-  updateDB();
+  localStorage.setItem("user", JSON.stringify(user));
 }
 </script>
 
