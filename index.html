@@ -32,28 +32,18 @@ input,button{width:100%;padding:8px;margin-top:6px;border:none;border-radius:5px
 button{background:#1c4cff;color:#fff}
 
 #admBtn{
-  position:fixed;
-  right:10px;
-  top:50%;
+  position:fixed;right:10px;top:50%;
   transform:translateY(-50%);
-  background:#ff4444;
-  padding:12px;
-  border-radius:10px;
-  display:none;
-  cursor:pointer;
-  z-index:1000;
+  background:#ff4444;padding:12px;
+  border-radius:10px;display:none;
+  cursor:pointer;z-index:1000
 }
 #admPanel{
-  position:fixed;
-  right:80px;
-  top:50%;
+  position:fixed;right:80px;top:50%;
   transform:translateY(-50%);
-  background:#020a18;
-  padding:15px;
-  width:260px;
-  border-radius:12px;
-  display:none;
-  z-index:1000;
+  background:#020a18;padding:15px;
+  width:260px;border-radius:12px;
+  display:none;z-index:1000
 }
 
 .rank{background:#020a18;padding:8px;margin:6px 0;border-radius:6px}
@@ -94,8 +84,24 @@ button{background:#1c4cff;color:#fff}
       <p id="device"></p>
     </div>
 
+    <div class="section" id="loja">
+      <div class="borders">
+        <div class="border gold" onclick="buyBorder('gold')"></div>
+        <div class="border blue" onclick="buyBorder('#00aaff')"></div>
+        <div class="border red" onclick="buyBorder('#ff4444')"></div>
+      </div>
+    </div>
+
     <div class="section" id="inventario">
       <div class="inventory" id="inv"></div>
+    </div>
+
+    <div class="section" id="premium">
+      <button onclick="buyPremium()">Comprar Premium</button>
+    </div>
+
+    <div class="section" id="foto">
+      <input type="file" accept="image/*" onchange="setPhoto(event)">
     </div>
 
     <div class="section" id="ranking">
@@ -109,93 +115,121 @@ button{background:#1c4cff;color:#fff}
 
 <div id="admPanel">
   <h3>👑 PAINEL ADM</h3>
-  <button onclick="giveMoney()">Dar dinheiro</button>
-  <button onclick="givePremium()">Dar Premium</button>
+
+  <h4>Dar dinheiro</h4>
+  <input id="admMoneyName" placeholder="Jogador">
+  <input id="admMoneyValue" type="number" placeholder="Quantia">
+  <button onclick="admGiveMoney()">Enviar</button>
+
+  <h4>Dar ADM</h4>
+  <input id="admAdminName" placeholder="Jogador">
+  <input id="admAdminDays" type="number" placeholder="Dias">
+  <button onclick="admGiveAdmin()">Dar ADM</button>
 </div>
 
 <script>
-const ADM_NAME = "Rodolfo";
-const ADM_PASS = "rodolfo408*";
+const ADM_NAME="Rodolfo";
+const ADM_PASS="rodolfo408*";
+let user=null;
+let playersDB=JSON.parse(localStorage.getItem("playersDB")||"[]");
 
-let user = null;
-
-// 🔥 AUTO LOGIN CORRIGIDO (NUNCA MAIS PERDE ADM)
-let saved = localStorage.getItem("user");
-if(saved){
-  user = JSON.parse(saved);
-
-  // GARANTIA ABSOLUTA DE ADM
-  if(user.name === ADM_NAME){
-    user.admin = true;
-  }
-
-  start();
+if(playersDB.length===0){
+  ["João","Maria","Carlos","Ana","Lucas"].forEach(n=>{
+    playersDB.push({name:n,coins:1000});
+  });
+  localStorage.setItem("playersDB",JSON.stringify(playersDB));
 }
 
-// LOGIN MANUAL
-function login(){
-  if(loginName.value !== ADM_NAME || loginPass.value !== ADM_PASS){
-    alert("Login inválido");
-    return;
-  }
-
-  user = {
-    name: ADM_NAME,
-    coins: 999999,
-    admin: true,
-    premium: false,
-    inventory: ["ADMIN"],
-    equipped: null,
-    device: detectDevice()
-  };
-
-  saveUser();
+let saved=localStorage.getItem("user");
+if(saved){
+  user=JSON.parse(saved);
+  if(user.name===ADM_NAME) user.admin=true;
   start();
 }
 
 function detectDevice(){
-  const ua = navigator.userAgent.toLowerCase();
-  if(ua.includes("android") || ua.includes("iphone") || ua.includes("ipad")){
-    return "📱 Mobile";
+  let ua=navigator.userAgent.toLowerCase();
+  return ua.includes("android")||ua.includes("iphone")?"📱 Mobile":"💻 PC";
+}
+
+function login(){
+  if(loginName.value!==ADM_NAME||loginPass.value!==ADM_PASS){
+    alert("Login inválido");return;
   }
-  return "💻 PC";
+  user={name:ADM_NAME,coins:999999,admin:true,premium:false,inventory:["ADMIN"],device:detectDevice()};
+  saveUser();start();
 }
 
 function start(){
   loginScreen.classList.remove("active");
   gameScreen.classList.add("active");
-
-  nome.innerText = user.name;
-  coins.innerText = "∞";
-  status.innerText = "👑 ADM";
-  device.innerText = user.device;
-
-  // 🔥 ADM SEMPRE VISÍVEL
-  admBtn.style.display = "block";
-}
-
-function toggleAdm(){
-  admPanel.style.display =
-    admPanel.style.display === "block" ? "none" : "block";
-}
-
-function giveMoney(){
-  alert("Dinheiro enviado (exemplo)");
-}
-
-function givePremium(){
-  alert("Premium enviado (exemplo)");
+  nome.innerText=user.name;
+  coins.innerText="∞";
+  status.innerText="👑 ADM";
+  device.innerText=user.device;
+  admBtn.style.display="block";
+  updateDB();
 }
 
 function openSec(id){
-  if(id === "apps"){
-    window.location.href = "painel.html";
-    return;
-  }
+  if(id==="apps"){window.location.href="painel.html";return;}
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(id==="inventario") renderInv();
+  if(id==="ranking") renderRank();
 }
 
+function buyBorder(c){
+  user.inventory.push(c);saveUser();
+}
+function renderInv(){
+  inv.innerHTML="";
+  user.inventory.forEach(b=>{
+    let d=document.createElement("div");
+    d.className="border";
+    d.style.borderColor=b==="ADMIN"?"gold":b;
+    inv.appendChild(d);
+  });
+}
+function buyPremium(){user.premium=true;saveUser();}
+function setPhoto(e){
+  let r=new FileReader();
+  r.onload=()=>{avatar.innerHTML=`<img src="${r.result}">`;saveUser()}
+  r.readAsDataURL(e.target.files[0]);
+}
+function toggleAdm(){
+  admPanel.style.display=admPanel.style.display==="block"?"none":"block";
+}
+function admGiveMoney(){
+  let n=admMoneyName.value,v=Number(admMoneyValue.value);
+  let p=playersDB.find(x=>x.name===n);
+  if(!p){alert("Jogador não encontrado");return;}
+  p.coins+=v;localStorage.setItem("playersDB",JSON.stringify(playersDB));
+  alert("Dinheiro enviado");
+}
+function admGiveAdmin(){
+  let n=admAdminName.value,d=Number(admAdminDays.value);
+  let p=playersDB.find(x=>x.name===n);
+  if(!p){alert("Jogador não encontrado");return;}
+  p.admin=true;p.adminUntil=Date.now()+d*86400000;
+  localStorage.setItem("playersDB",JSON.stringify(playersDB));
+  alert("ADM dado");
+}
+function updateDB(){
+  let i=playersDB.findIndex(p=>p.name===user.name);
+  if(i>=0) playersDB[i]=user;
+  else playersDB.push(user);
+  localStorage.setItem("playersDB",JSON.stringify(playersDB));
+}
+function renderRank(){
+  rankList.innerHTML="";
+  playersDB.sort((a,b)=>b.coins-a.coins).forEach((p,i)=>{
+    rankList.innerHTML+=`<div class="rank">${i+1}º ${p.name} - 💰 ${p.coins}</div>`;
+  });
+}
 function saveUser(){
-  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("user",JSON.stringify(user));
+  updateDB();
 }
 </script>
 
